@@ -1,0 +1,20 @@
+{
+  "id": "apr_1769940921067_uptie3",
+  "contextId": "a558df87-0380-40ac-91db-be4366ffb38c",
+  "status": "pending",
+  "priority": "medium",
+  "requiredBy": "human",
+  "proposal": {
+    "recommendationTitle": "Outsource software development tasks to a third-party provider.",
+    "recommendationDescription": "Outsourcing allows the company to focus on their core competencies while reducing costs associated with hiring new employees or investing in expensive equipment. Cost: $75,000",
+    "estimatedCost": 75000,
+    "confidence": 0.6000000000000001,
+    "riskLevel": "low",
+    "alternativeCount": 2
+  },
+  "submittedAt": "2026-02-01T10:15:21.067Z",
+  "expiresAt": "2026-02-02T10:15:21.067Z",
+  "approver": null,
+  "approvalNotes": null,
+  "modifications": null
+}

@@ -1,0 +1,20 @@
+{
+  "id": "apr_1769940759385_54x2mi",
+  "contextId": "62ed64d0-c1ba-46e9-afe8-024fdd3a9a41",
+  "status": "pending",
+  "priority": "medium",
+  "requiredBy": "human",
+  "proposal": {
+    "recommendationTitle": "Wait for a better opportunity.",
+    "recommendationDescription": "Wait for a better opportunity.",
+    "estimatedCost": 0,
+    "confidence": 0.5,
+    "riskLevel": "low",
+    "alternativeCount": 2
+  },
+  "submittedAt": "2026-02-01T10:12:39.385Z",
+  "expiresAt": "2026-02-02T10:12:39.385Z",
+  "approver": null,
+  "approvalNotes": null,
+  "modifications": null
+}

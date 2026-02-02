@@ -1,0 +1,16 @@
+{
+  "id": "apr_1769940372945_2e4gj0",
+  "contextId": "68009df9-65a2-400b-9911-3e3bf3b1f1f1",
+  "status": "pending",
+  "priority": "medium",
+  "requiredBy": "human",
+  "proposal": {
+    "confidence": 0.55,
+    "alternativeCount": 0
+  },
+  "submittedAt": "2026-02-01T10:06:12.946Z",
+  "expiresAt": "2026-02-02T10:06:12.946Z",
+  "approver": null,
+  "approvalNotes": null,
+  "modifications": null
+}

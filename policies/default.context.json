@@ -1,0 +1,12 @@
+{
+  "maxTokenBudget": 4000,
+  "minSimilarityScore": 0.7,
+  "maxRetrievedDocuments": 5,
+  "onLowQualityRetrieval": "warn_and_proceed",
+  "onNoRetrieval": "proceed_without_context",
+  "contextPriority": [
+    "recent_memory",
+    "relevant_documents",
+    "historical_decisions"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "id": "apr_1769935192861_1auv52",
+  "contextId": "c611f345-1629-4414-9c33-8ed2aeb47f80",
+  "status": "pending",
+  "priority": "medium",
+  "requiredBy": "human",
+  "proposal": {
+    "recommendationTitle": "Partnership Entry",
+    "recommendationDescription": "Enter market through strategic local partnership",
+    "estimatedCost": 150000,
+    "confidence": 0.8,
+    "riskLevel": "medium",
+    "alternativeCount": 1
+  },
+  "submittedAt": "2026-02-01T08:39:52.862Z",
+  "expiresAt": "2026-02-02T08:39:52.862Z",
+  "approver": null,
+  "approvalNotes": null,
+  "modifications": null
+}

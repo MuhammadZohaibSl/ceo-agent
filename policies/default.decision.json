@@ -1,0 +1,23 @@
+{
+  "riskAppetite": 0.4,
+  "timeHorizon": "long-term",
+  "growthVsStability": 0.5,
+  "ethicalRedLines": [
+    "no_illegal_actions",
+    "no_deceptive_practices",
+    "no_harm_to_stakeholders"
+  ],
+  "budgetConstraints": {
+    "requiresApprovalAbove": 100000,
+    "hardLimitUSD": 1000000
+  },
+  "legalConstraints": [
+    "gdpr_compliance",
+    "data_privacy"
+  ],
+  "decisionPrinciples": [
+    "transparency_first",
+    "stakeholder_consideration",
+    "long_term_value"
+  ]
+}

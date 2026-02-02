@@ -1,0 +1,20 @@
+{
+  "id": "apr_1769937831019_x0p8vi",
+  "contextId": "90230291-5408-45c2-aff1-f70f99b69bcf",
+  "status": "pending",
+  "priority": "medium",
+  "requiredBy": "human",
+  "proposal": {
+    "recommendationTitle": "Modified Approach",
+    "recommendationDescription": "Proceed with reduced scope or modified parameters",
+    "estimatedCost": 250000,
+    "confidence": 0.8,
+    "riskLevel": "low",
+    "alternativeCount": 1
+  },
+  "submittedAt": "2026-02-01T09:23:51.019Z",
+  "expiresAt": "2026-02-02T09:23:51.019Z",
+  "approver": null,
+  "approvalNotes": null,
+  "modifications": null
+}
