@@ -23,7 +23,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 // Create axios instance with defaults
 const apiClient: AxiosInstance = axios.create({
     baseURL: API_BASE_URL,
-    timeout: 120000, // 2 minutes for LLM responses
+    timeout: 600000, // 10 minutes for complex LLM analysis
     headers: {
         'Content-Type': 'application/json',
     },

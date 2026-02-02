@@ -1,0 +1,20 @@
+{
+  "id": "apr_1770029192273_8alruo",
+  "contextId": "b6a31668-b0a1-434b-809c-f509a65dae2c",
+  "status": "pending",
+  "priority": "medium",
+  "requiredBy": "human",
+  "proposal": {
+    "recommendationTitle": "Pass on Investment",
+    "recommendationDescription": "Decline this opportunity, preserve capital",
+    "estimatedCost": 0,
+    "confidence": 0.65,
+    "riskLevel": "low",
+    "alternativeCount": 0
+  },
+  "submittedAt": "2026-02-02T10:46:32.273Z",
+  "expiresAt": "2026-02-03T10:46:32.273Z",
+  "approver": null,
+  "approvalNotes": null,
+  "modifications": null
+}

@@ -50,7 +50,7 @@ async function initialize() {
             ollama: new OllamaClient({
                 model: process.env.OLLAMA_MODEL ?? 'llama2',
                 baseUrl: process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434',
-                timeout: parseInt(process.env.LLM_TIMEOUT, 10) || 120000,
+                timeout: parseInt(process.env.OLLAMA_TIMEOUT, 10) || 300000, // 5 minutes for local models
             }),
         },
     });

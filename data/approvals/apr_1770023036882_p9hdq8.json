@@ -1,0 +1,20 @@
+{
+  "id": "apr_1770023036882_p9hdq8",
+  "contextId": "37d2141e-deb4-42e9-a22d-9726aba49e0d",
+  "status": "pending",
+  "priority": "medium",
+  "requiredBy": "human",
+  "proposal": {
+    "recommendationTitle": "Outsource certain tasks to reduce costs and free up resources for other areas such as research and d",
+    "recommendationDescription": "Outsource certain tasks to reduce costs and free up resources for other areas such as research and development. This option would save $50,000 per year but also carries a high risk of decreased control over quality and consistency. The timeline is flexible with the ability to complete outsourcing in 6-12 months depending on the project.",
+    "estimatedCost": 0,
+    "confidence": 0.5,
+    "riskLevel": "low",
+    "alternativeCount": 2
+  },
+  "submittedAt": "2026-02-02T09:03:56.882Z",
+  "expiresAt": "2026-02-03T09:03:56.882Z",
+  "approver": null,
+  "approvalNotes": null,
+  "modifications": null
+}

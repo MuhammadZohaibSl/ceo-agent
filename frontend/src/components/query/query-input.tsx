@@ -2,7 +2,7 @@
 
 /**
  * Query Input Component
- * Main input area for strategic questions with constraints
+ * Main input area for strategic questions with constraints - Mobile-first design
  */
 
 import { useState } from 'react';
@@ -36,89 +36,89 @@ export function QueryInput() {
   
   return (
     <Card className="border-border/50 bg-card/80">
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-2 md:pb-3 px-4 md:px-6">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base font-medium flex items-center gap-2">
-            <span className="w-6 h-6 rounded bg-primary/10 flex items-center justify-center text-xs">🎯</span>
+          <CardTitle className="text-sm md:text-base font-medium flex items-center gap-2">
+
             Strategic Query
           </CardTitle>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setShowConstraints(!showConstraints)}
-            className="text-muted-foreground text-xs"
+            className="text-muted-foreground text-[10px] md:text-xs h-8 px-2 md:px-3"
           >
-            {showConstraints ? 'Hide' : 'Show'} Constraints
+            {showConstraints ? 'Hide' : 'Constraints'}
           </Button>
         </div>
       </CardHeader>
       
-      <CardContent className="space-y-4">
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <CardContent className="space-y-3 md:space-y-4 px-4 md:px-6">
+        <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
           <div className="space-y-2">
             <Textarea
-              placeholder="Enter your strategic question... (e.g., 'Should we expand into the European market next quarter?')"
+              placeholder="Enter your strategic question..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="min-h-[100px] resize-none bg-background/50 border-border/50 focus:border-primary/50 transition-colors"
+              className="min-h-[80px] md:min-h-[100px] resize-none bg-background/50 border-border/50 focus:border-primary/50 transition-colors text-sm md:text-base"
               disabled={isAnalyzing}
             />
             
             {/* Active constraints badges */}
             {(constraints.budgetLimit || constraints.timeHorizon || constraints.riskTolerance) && (
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5 md:gap-2">
                 {constraints.budgetLimit && (
-                  <Badge variant="secondary" className="text-xs">
-                    Budget: ${constraints.budgetLimit.toLocaleString()}
+                  <Badge variant="secondary" className="text-[10px] md:text-xs">
+                    ${constraints.budgetLimit.toLocaleString()}
                   </Badge>
                 )}
                 {constraints.timeHorizon && (
-                  <Badge variant="secondary" className="text-xs">
-                    Timeline: {constraints.timeHorizon}
+                  <Badge variant="secondary" className="text-[10px] md:text-xs">
+                    {constraints.timeHorizon}
                   </Badge>
                 )}
                 {constraints.riskTolerance && (
-                  <Badge variant="secondary" className="text-xs capitalize">
-                    Risk: {constraints.riskTolerance}
+                  <Badge variant="secondary" className="text-[10px] md:text-xs capitalize">
+                    {constraints.riskTolerance}
                   </Badge>
                 )}
               </div>
             )}
           </div>
           
-          {/* Constraints Panel */}
+          {/* Constraints Panel - Stack on mobile */}
           {showConstraints && (
-            <div className="grid grid-cols-3 gap-3 p-4 rounded-lg bg-muted/30 border border-border/30">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 md:p-4 rounded-lg bg-muted/30 border border-border/30">
               <div className="space-y-1.5">
-                <label className="text-xs text-muted-foreground font-medium">Budget Limit ($)</label>
+                <label className="text-[10px] md:text-xs text-muted-foreground font-medium">Budget ($)</label>
                 <Input
                   type="number"
-                  placeholder="e.g., 500000"
+                  placeholder="500000"
                   value={formatCurrency(constraints.budgetLimit)}
                   onChange={(e) => updateConstraint('budgetLimit', e.target.value ? parseInt(e.target.value) : undefined)}
-                  className="h-9 bg-background/50"
+                  className="h-9 md:h-10 bg-background/50 text-sm"
                   disabled={isAnalyzing}
                 />
               </div>
               
               <div className="space-y-1.5">
-                <label className="text-xs text-muted-foreground font-medium">Time Horizon</label>
+                <label className="text-[10px] md:text-xs text-muted-foreground font-medium">Timeline</label>
                 <Input
                   type="text"
-                  placeholder="e.g., Q2 2026"
+                  placeholder="Q2 2026"
                   value={constraints.timeHorizon || ''}
                   onChange={(e) => updateConstraint('timeHorizon', e.target.value || undefined)}
-                  className="h-9 bg-background/50"
+                  className="h-9 md:h-10 bg-background/50 text-sm"
                   disabled={isAnalyzing}
                 />
               </div>
               
               <div className="space-y-1.5">
-                <label className="text-xs text-muted-foreground font-medium">Risk Tolerance</label>
+                <label className="text-[10px] md:text-xs text-muted-foreground font-medium">Risk</label>
                 <select
                   value={constraints.riskTolerance || ''}
                   onChange={(e) => updateConstraint('riskTolerance', e.target.value as 'low' | 'medium' | 'high' | undefined || undefined)}
-                  className="h-9 w-full rounded-md border border-input bg-background/50 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                  className="h-9 md:h-10 w-full rounded-md border border-input bg-background/50 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
                   disabled={isAnalyzing}
                 >
                   <option value="">Select...</option>
@@ -132,7 +132,7 @@ export function QueryInput() {
           
           <Button 
             type="submit" 
-            className="w-full"
+            className="w-full h-10 md:h-11 touch-target text-sm md:text-base"
             disabled={!query.trim() || isAnalyzing}
           >
             {isAnalyzing ? (

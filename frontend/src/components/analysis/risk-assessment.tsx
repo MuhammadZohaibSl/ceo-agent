@@ -34,7 +34,7 @@ export function RiskAssessmentDisplay({ risks }: RiskAssessmentDisplayProps) {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base font-medium flex items-center gap-2">
-            <span className="w-6 h-6 rounded bg-amber-500/10 flex items-center justify-center text-xs">⚠️</span>
+
             Risk Assessment
           </CardTitle>
           <Badge variant="outline" className={getOverallColor(risks.overallLevel)}>

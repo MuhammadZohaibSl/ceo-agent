@@ -2,18 +2,26 @@
 
 /**
  * Header Component
- * Top navigation bar with status indicators and actions
+ * Responsive navigation - desktop only, mobile uses bottom nav
  */
 
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useStatus } from '@/hooks/use-api';
-import { useUIStore } from '@/stores/ui-store';
+
+const navItems = [
+  { href: '/', label: 'Analysis' },
+  { href: '/dashboard', label: 'Dashboard' },
+  { href: '/history', label: 'History' },
+  { href: '/settings', label: 'Settings' },
+];
 
 export function Header() {
+  const pathname = usePathname();
   const { data: status, isLoading } = useStatus();
-  const { sidebarTab, setSidebarTab } = useUIStore();
   
   const getProviderStatus = () => {
     if (isLoading || !status) return 'loading';
@@ -25,63 +33,54 @@ export function Header() {
   const providerStatus = getProviderStatus();
   
   return (
-    <header className="h-16 border-b border-border/40 bg-card/50 backdrop-blur-sm">
-      <div className="h-full px-6 flex items-center justify-between">
+    <header className="h-14 md:h-16 border-b border-border/40 bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+      <div className="h-full px-4 md:px-6 flex items-center justify-between">
         {/* Logo and Title */}
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-            <span className="text-primary font-bold text-sm">CEO</span>
-          </div>
+        <Link href="/" className="flex items-center gap-2 md:gap-3 hover:opacity-80 transition-opacity">
+          
           <div>
-            <h1 className="text-lg font-semibold text-foreground">CEO Agent</h1>
-            <p className="text-xs text-muted-foreground">Strategic Decision Support</p>
+            <h1 className="text-base md:text-lg font-semibold text-foreground">CEO Agent</h1>
+            <p className="text-[10px] md:text-xs text-muted-foreground hidden sm:block">Strategic Decision Support</p>
           </div>
-        </div>
+        </Link>
         
-        {/* Navigation Tabs */}
-        <nav className="flex items-center gap-1">
-          <Button
-            variant={sidebarTab === 'analysis' ? 'secondary' : 'ghost'}
-            size="sm"
-            onClick={() => setSidebarTab('analysis')}
-          >
-            Analysis
-          </Button>
-          <Button
-            variant={sidebarTab === 'documents' ? 'secondary' : 'ghost'}
-            size="sm"
-            onClick={() => setSidebarTab('documents')}
-          >
-            Documents
-          </Button>
-          <Button
-            variant={sidebarTab === 'approvals' ? 'secondary' : 'ghost'}
-            size="sm"
-            onClick={() => setSidebarTab('approvals')}
-          >
-            Approvals
-          </Button>
+        {/* Navigation - Desktop Only */}
+        <nav className="hidden md:flex items-center gap-1">
+          {navItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link key={item.href} href={item.href}>
+                <Button
+                  variant={isActive ? 'secondary' : 'ghost'}
+                  size="sm"
+                  className={isActive ? '' : 'text-muted-foreground hover:text-foreground'}
+                >
+                  {item.label}
+                </Button>
+              </Link>
+            );
+          })}
         </nav>
         
         {/* Status Indicators */}
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-muted-foreground">LLM:</span>
+        <div className="flex items-center gap-2 md:gap-4">
+          <div className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm">
+            <span className="text-muted-foreground hidden sm:inline">LLM:</span>
             <Badge 
               variant={providerStatus === 'online' ? 'default' : providerStatus === 'loading' ? 'secondary' : 'destructive'}
-              className="capitalize"
+              className="text-[10px] md:text-xs capitalize"
             >
-              {isLoading ? 'Connecting...' : providerStatus === 'online' 
-                ? `${status?.llm.availableProviders} Provider${status?.llm.availableProviders === 1 ? '' : 's'}`
-                : 'Offline'}
+              {isLoading ? '...' : providerStatus === 'online' 
+                ? `${status?.llm.availableProviders}`
+                : 'Off'}
             </Badge>
           </div>
           
-          <Separator orientation="vertical" className="h-6" />
+          <Separator orientation="vertical" className="h-4 md:h-6 hidden sm:block" />
           
-          <div className="flex items-center gap-2 text-sm">
+          <div className="hidden sm:flex items-center gap-1.5 md:gap-2 text-xs md:text-sm">
             <span className="text-muted-foreground">Docs:</span>
-            <Badge variant="secondary">
+            <Badge variant="secondary" className="text-[10px] md:text-xs">
               {isLoading ? '...' : status?.rag.vectorStore.uniqueDocuments || 0}
             </Badge>
           </div>

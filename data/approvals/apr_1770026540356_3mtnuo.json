@@ -1,0 +1,20 @@
+{
+  "id": "apr_1770026540356_3mtnuo",
+  "contextId": "a5e6696b-afe0-4106-b0c0-3f7d7df58e07",
+  "status": "pending",
+  "priority": "medium",
+  "requiredBy": "human",
+  "proposal": {
+    "recommendationTitle": "Outsource work to an external engineering firm on a project basis.",
+    "recommendationDescription": "Hire a reputable engineering agency and provide them with clear instructions and requirements for the project. Monitor their progress and communicate frequently to ensure that both parties are aligned.",
+    "estimatedCost": 50000,
+    "confidence": 0.6000000000000001,
+    "riskLevel": "low",
+    "alternativeCount": 2
+  },
+  "submittedAt": "2026-02-02T10:02:20.356Z",
+  "expiresAt": "2026-02-03T10:02:20.356Z",
+  "approver": null,
+  "approvalNotes": null,
+  "modifications": null
+}

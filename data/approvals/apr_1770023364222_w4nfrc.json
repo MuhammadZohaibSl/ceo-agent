@@ -1,0 +1,20 @@
+{
+  "id": "apr_1770023364222_w4nfrc",
+  "contextId": "43865892-ef17-4812-baed-354655a41617",
+  "status": "pending",
+  "priority": "medium",
+  "requiredBy": "human",
+  "proposal": {
+    "recommendationTitle": "Expanding into the EU market can increase our customer base and revenue, but it also involves additi",
+    "recommendationDescription": "Expanding into the EU market can increase our customer base and revenue, but it also involves additional regulations and taxes. We need to allocate at least 10% of our budget for this expansion and expect a 5-year timeline.",
+    "estimatedCost": 0,
+    "confidence": 0.4,
+    "riskLevel": "low",
+    "alternativeCount": 2
+  },
+  "submittedAt": "2026-02-02T09:09:24.222Z",
+  "expiresAt": "2026-02-03T09:09:24.223Z",
+  "approver": null,
+  "approvalNotes": null,
+  "modifications": null
+}

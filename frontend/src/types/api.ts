@@ -110,11 +110,11 @@ export interface AgentStatus {
 
 // LLM provider status
 export interface LLMProviderStatus {
-    healthy: boolean;
+    configured: boolean;
     model: string;
-    latency: number;
-    errorCount: number;
-    lastUsed: string | null;
+    health: 'healthy' | 'degraded' | 'unhealthy' | 'critical';
+    score: number;
+    available: boolean;
 }
 
 // LLM status

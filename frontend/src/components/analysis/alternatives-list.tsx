@@ -31,7 +31,7 @@ export function AlternativesList({ alternatives }: AlternativesListProps) {
     <Card className="border-border/50 bg-card/80">
       <CardHeader className="pb-3">
         <CardTitle className="text-base font-medium flex items-center gap-2">
-          <span className="w-6 h-6 rounded bg-muted flex items-center justify-center text-xs">📋</span>
+
           Alternative Options
         </CardTitle>
       </CardHeader>

@@ -31,7 +31,7 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-base font-medium flex items-center gap-2">
-            <span className="w-6 h-6 rounded bg-primary/20 flex items-center justify-center text-xs">📌</span>
+
             Top Recommendation
           </CardTitle>
           <Badge variant="outline" className={getRiskColor(recommendation.riskLevel)}>

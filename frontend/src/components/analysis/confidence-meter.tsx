@@ -73,7 +73,7 @@ export function ConfidenceMeter({
         {requiresApproval && (
           <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-amber-500">🔐</span>
+
               <span className="text-sm font-medium text-amber-500">Requires Human Approval</span>
             </div>
             {approvalReason && (

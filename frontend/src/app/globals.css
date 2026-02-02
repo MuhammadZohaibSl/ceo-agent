@@ -123,3 +123,28 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Mobile-first utilities */
+@layer utilities {
+  /* Safe area for fixed bottom navigation */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  
+  /* Mobile page padding for bottom nav */
+  .pb-mobile-nav {
+    padding-bottom: 5rem; /* h-16 + some extra */
+  }
+  
+  @media (min-width: 768px) {
+    .pb-mobile-nav {
+      padding-bottom: 0;
+    }
+  }
+  
+  /* Touch-friendly minimum sizes */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

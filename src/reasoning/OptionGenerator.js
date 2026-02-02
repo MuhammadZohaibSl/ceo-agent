@@ -95,14 +95,27 @@ export class OptionGenerator {
             .replace('{{budget}}', budget);
 
         try {
+            this.log.info('Sending prompt to LLM', { promptLength: prompt.length });
             const response = await this.llmClient.generate(prompt);
+
+            // Log raw response for debugging
+            const responseStr = typeof response === 'object'
+                ? (response.response ?? response.content ?? JSON.stringify(response))
+                : response;
+            this.log.info('LLM raw response received', {
+                responseLength: responseStr?.length,
+                preview: responseStr?.substring(0, 200)
+            });
+
             const options = this._parseOptions(response);
 
             this.log.info('Options generated via LLM', { count: options.length });
 
             // If parsing failed, fall back to rules
             if (options.length === 0) {
-                this.log.warn('LLM response parsing yielded 0 options, using rules');
+                this.log.warn('LLM response parsing yielded 0 options, using rules', {
+                    rawResponse: responseStr?.substring(0, 500)
+                });
                 return this._generateRuleBased(params);
             }
 
