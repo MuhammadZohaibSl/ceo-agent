@@ -1,0 +1,20 @@
+{
+  "id": "apr_1770021493152_vc92vd",
+  "contextId": "db40fed2-0a87-41ec-a206-b6fd81dd4aea",
+  "status": "pending",
+  "priority": "medium",
+  "requiredBy": "human",
+  "proposal": {
+    "recommendationTitle": "Delay expansion until we have more resources.",
+    "recommendationDescription": "Focus on growing our existing customer base and improving our product.",
+    "estimatedCost": 0,
+    "confidence": 0.6000000000000001,
+    "riskLevel": "medium",
+    "alternativeCount": 2
+  },
+  "submittedAt": "2026-02-02T08:38:13.152Z",
+  "expiresAt": "2026-02-03T08:38:13.152Z",
+  "approver": null,
+  "approvalNotes": null,
+  "modifications": null
+}

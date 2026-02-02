@@ -7,11 +7,16 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
+    "server": "node src/api/index.js",
+    "server:dev": "node --watch src/api/index.js",
+    "server:legacy": "node src/server.js",
     "test": "node --test tests/"
   },
   "keywords": ["ai", "agent", "ceo", "decision-support"],
   "license": "MIT",
   "engines": {
     "node": ">=18.0.0"
+  },
+  "dependencies": {
   }
 }
