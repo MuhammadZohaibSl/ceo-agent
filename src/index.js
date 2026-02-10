@@ -29,7 +29,7 @@ import { createAgent } from './core/Agent.js';
 import { createMemoryManager } from './memory/index.js';
 import { createRAGEngine } from './rag/index.js';
 import { OptionGenerator, OptionEvaluator, RiskModel, DecisionFormatter } from './reasoning/index.js';
-import { createLLMRouter, OpenAIClient, AnthropicClient, OllamaClient, RoutingStrategy } from './llm/index.js';
+import { createLLMRouter, OpenRouterClient, GroqClient, RoutingStrategy } from './llm/index.js';
 import { createSafetyGuard } from './safety/index.js';
 import { createAuditLogger, createApprovalManager, createFeedbackCollector } from './audit/index.js';
 import config, { validateConfig } from './config/index.js';
@@ -51,20 +51,15 @@ async function main() {
     const llmRouter = createLLMRouter({
         strategy: RoutingStrategy.BEST_AVAILABLE,
         providers: {
-            openai: new OpenAIClient({
-                apiKey: config.llm.providers?.openai?.apiKey ?? '',
-                model: config.llm.providers?.openai?.model ?? 'gpt-4',
-                timeout: config.llm.timeout,
+            groq: new GroqClient({
+                apiKey: process.env.GROQ_API_KEY ?? '',
+                model: process.env.GROQ_MODEL ?? 'llama-3.3-70b-versatile',
+                timeout: parseInt(process.env.LLM_TIMEOUT, 10) || 60000,
             }),
-            anthropic: new AnthropicClient({
-                apiKey: config.llm.providers?.claude?.apiKey ?? '',
-                model: config.llm.providers?.claude?.model ?? 'claude-3-sonnet-20240229',
-                timeout: config.llm.timeout,
-            }),
-            ollama: new OllamaClient({
-                model: process.env.OLLAMA_MODEL ?? 'llama2',
-                baseUrl: process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434',
-                timeout: parseInt(process.env.LLM_TIMEOUT, 10) || 120000,
+            openrouter: new OpenRouterClient({
+                apiKey: process.env.OPENROUTER_API_KEY ?? '',
+                model: process.env.OPENROUTER_MODEL ?? 'openrouter/auto',
+                timeout: parseInt(process.env.LLM_TIMEOUT, 10) || 60000,
             }),
         },
     });

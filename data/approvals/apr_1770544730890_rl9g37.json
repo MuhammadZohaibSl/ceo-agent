@@ -1,0 +1,21 @@
+{
+  "id": "apr_1770544730890_rl9g37",
+  "contextId": "917aa3dc-ee6e-4800-90db-f2de1ed83be7",
+  "status": "approved",
+  "priority": "medium",
+  "requiredBy": "human",
+  "proposal": {
+    "recommendationTitle": "Deepening Customer Value & Operational Efficiency",
+    "recommendationDescription": "Concentrate on enhancing the value proposition for existing customers through improved support, tailored solutions, and loyalty programs, while simultaneously optimizing internal processes for greater efficiency and profitability. This option focuses on sustainable, profitable growth and customer retention.",
+    "estimatedCost": 15000002500000,
+    "confidence": 0.7200000000000001,
+    "riskLevel": "medium",
+    "alternativeCount": 2
+  },
+  "submittedAt": "2026-02-08T09:58:50.890Z",
+  "expiresAt": "2026-02-09T09:58:50.890Z",
+  "approver": "User",
+  "approvalNotes": "",
+  "modifications": null,
+  "decidedAt": "2026-02-08T09:59:19.815Z"
+}

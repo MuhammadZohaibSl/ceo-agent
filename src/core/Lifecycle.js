@@ -153,13 +153,19 @@ export class Lifecycle {
 
         // Generate options via LLM
         if (this.deps.optionGenerator) {
-            const options = await this.deps.optionGenerator.generate({
+            const result = await this.deps.optionGenerator.generate({
                 query: ctx.query,
                 memory: ctx.memory,
                 ragContext: ctx.ragContext,
                 constraints: ctx.constraints,
                 decisionPolicy: ctx.decisionPolicy,
+                preferredProvider: ctx.preferredProvider,
             });
+
+            // Extract options and provider from result
+            const options = result.options ?? result;
+            const provider = result.provider ?? 'unknown';
+            ctx.setLLMProvider(provider);
 
             // Filter options that violate ethical red lines
             const filteredOptions = this._filterByRedLines(options, ctx.decisionPolicy);
@@ -246,6 +252,7 @@ export class Lifecycle {
                 risks: ctx.risks,
                 constraints: ctx.constraints,
                 missingData: ctx.missingData,
+                llmProvider: ctx.llmProvider,
             });
         } else {
             // Default proposal structure

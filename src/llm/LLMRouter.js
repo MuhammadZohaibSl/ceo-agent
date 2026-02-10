@@ -20,13 +20,14 @@ export const RoutingStrategy = {
 
 /**
  * Provider preferences by task type
+ * Only providers with configured API keys are included
  */
 const TASK_PREFERENCES = {
-    [LLMTaskType.OPTION_GENERATION]: ['openai', 'anthropic', 'ollama'],
-    [LLMTaskType.ANALYSIS]: ['anthropic', 'openai', 'ollama'],
-    [LLMTaskType.SUMMARIZATION]: ['anthropic', 'openai', 'ollama'],
-    [LLMTaskType.CLASSIFICATION]: ['openai', 'ollama', 'anthropic'],
-    [LLMTaskType.EXTRACTION]: ['openai', 'anthropic', 'ollama'],
+    [LLMTaskType.OPTION_GENERATION]: ['groq', 'openrouter'],
+    [LLMTaskType.ANALYSIS]: ['groq', 'openrouter'],
+    [LLMTaskType.SUMMARIZATION]: ['groq', 'openrouter'],
+    [LLMTaskType.CLASSIFICATION]: ['groq', 'openrouter'],
+    [LLMTaskType.EXTRACTION]: ['groq', 'openrouter'],
 };
 
 export class LLMRouter {
@@ -289,8 +290,8 @@ export class LLMRouter {
     }
 
     _orderByCost(providers) {
-        // Simple cost ordering (can be enhanced with actual pricing)
-        const costOrder = ['ollama', 'openai', 'anthropic'];
+        // Cost ordering: Groq and OpenRouter have free/cheap models
+        const costOrder = ['groq', 'openrouter'];
         return [...providers].sort((a, b) => {
             return costOrder.indexOf(a) - costOrder.indexOf(b);
         });

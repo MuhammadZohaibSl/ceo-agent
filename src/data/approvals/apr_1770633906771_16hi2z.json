@@ -1,0 +1,20 @@
+{
+  "id": "apr_1770633906771_16hi2z",
+  "contextId": "d8492f60-bfa2-4336-8e1c-0ccd5a6e75f9",
+  "status": "pending",
+  "priority": "medium",
+  "requiredBy": "human",
+  "proposal": {
+    "recommendationTitle": "Conduct Market Research and Analysis",
+    "recommendationDescription": "This approach involves conducting thorough market research and analysis to understand the company's position, competitors, and potential areas for growth. This will include gathering data on customer needs, market trends, and competitor strategies. By analyzing this data, the company can identify opportunities to differentiate itself and make informed strategic decisions.",
+    "estimatedCost": 80000,
+    "confidence": 0.7700000000000001,
+    "riskLevel": "medium",
+    "alternativeCount": 2
+  },
+  "submittedAt": "2026-02-09T10:45:06.771Z",
+  "expiresAt": "2026-02-10T10:45:06.771Z",
+  "approver": null,
+  "approvalNotes": null,
+  "modifications": null
+}

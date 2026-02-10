@@ -1,0 +1,20 @@
+{
+  "id": "apr_1770545607152_58ji17",
+  "contextId": "9f8f7ce6-de98-4e28-b375-9ddc8fc6ed96",
+  "status": "pending",
+  "priority": "medium",
+  "requiredBy": "human",
+  "proposal": {
+    "recommendationTitle": "Strategic Partnership with a Local Tech Firm",
+    "recommendationDescription": "Identify and collaborate with an established Pakistani tech company that complements the business's offerings or market access. This partnership could involve co-development, joint go-to-market strategies, or reselling existing products. Due diligence on the partner's capabilities and reputation is crucial.",
+    "estimatedCost": 150000,
+    "confidence": 0.6900000000000002,
+    "riskLevel": "medium",
+    "alternativeCount": 2
+  },
+  "submittedAt": "2026-02-08T10:13:27.152Z",
+  "expiresAt": "2026-02-09T10:13:27.152Z",
+  "approver": null,
+  "approvalNotes": null,
+  "modifications": null
+}

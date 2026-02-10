@@ -5,7 +5,7 @@
  * Manage RAG documents
  */
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,14 +14,17 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { useDocuments, useUploadDocument, useDeleteDocument } from '@/hooks/use-api';
 import { useUIStore } from '@/stores/ui-store';
+import { ConfirmModal } from '@/components/ui/confirm-modal';
 
 export function DocumentsPanel() {
   const { data: documents, isLoading } = useDocuments();
   const uploadMutation = useUploadDocument();
   const deleteMutation = useDeleteDocument();
   const { isDocumentModalOpen, openDocumentModal, closeDocumentModal } = useUIStore();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [newDoc, setNewDoc] = useState<{ name: string; content: string; type: 'md' | 'txt' | 'json' }>({ name: '', content: '', type: 'md' });
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   
   const handleUpload = () => {
     if (!newDoc.name.trim() || !newDoc.content.trim()) return;
@@ -34,9 +37,36 @@ export function DocumentsPanel() {
     });
   };
   
-  const handleDelete = (id: string) => {
-    if (confirm('Are you sure you want to delete this document?')) {
-      deleteMutation.mutate(id);
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target?.result as string;
+      const fileName = file.name.replace(/\.[^/.]+$/, '');
+      const ext = file.name.split('.').pop()?.toLowerCase();
+      const fileType = ext === 'json' ? 'json' : ext === 'txt' ? 'txt' : 'md';
+      
+      setNewDoc({
+        name: fileName,
+        content: content,
+        type: fileType as 'md' | 'txt' | 'json',
+      });
+    };
+    reader.readAsText(file);
+    
+    // Reset input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+  
+  const handleDelete = () => {
+    if (deleteId) {
+      deleteMutation.mutate(deleteId, {
+        onSuccess: () => setDeleteId(null),
+      });
     }
   };
   
@@ -85,7 +115,7 @@ export function DocumentsPanel() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => handleDelete(doc.id)}
+                  onClick={() => setDeleteId(doc.id)}
                   disabled={deleteMutation.isPending}
                   className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive"
                 >
@@ -96,6 +126,27 @@ export function DocumentsPanel() {
           )}
         </CardContent>
       </Card>
+
+      {/* Delete Confirmation */}
+      <ConfirmModal
+        isOpen={!!deleteId}
+        onClose={() => setDeleteId(null)}
+        onConfirm={handleDelete}
+        title="Delete Document"
+        description="Are you sure you want to delete this document? This action cannot be undone and the document will be removed from the RAG knowledge base."
+        confirmText="Delete Document"
+        variant="destructive"
+        isLoading={deleteMutation.isPending}
+      />
+      
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".md,.txt,.json"
+        onChange={handleFileSelect}
+        className="hidden"
+      />
       
       {/* Upload Dialog */}
       <Dialog open={isDocumentModalOpen} onOpenChange={(open) => !open && closeDocumentModal()}>
@@ -104,7 +155,25 @@ export function DocumentsPanel() {
             <DialogTitle>Add Knowledge Document</DialogTitle>
           </DialogHeader>
           
-          <div className="space-y-4 py-4">
+          <div className="space-y-4 py-4 max-h-[60vh] overflow-y-auto pr-2">
+            {/* Upload from PC button */}
+            <div className="flex justify-center">
+              <Button
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full border-dashed"
+              >
+                📁 Upload from PC
+              </Button>
+            </div>
+            
+            <div className="relative flex items-center justify-center">
+              <span className="text-xs text-muted-foreground bg-background px-2">or enter manually</span>
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-border/50"></div>
+              </div>
+            </div>
+            
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">Document Name</label>
               <Input

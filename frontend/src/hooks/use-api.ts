@@ -5,6 +5,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { useQueryStore } from '@/stores/query-store';
+import { useStatusStore } from '@/stores/status-store';
 import type { AnalyzeRequest, ApproveRequest, RejectRequest, UploadDocumentRequest } from '@/types/api';
 
 // Query keys
@@ -20,14 +21,25 @@ export const queryKeys = {
  * Hook for fetching agent status
  */
 export function useStatus() {
+    const setStatus = useStatusStore(state => state.setStatus);
+    const setError = useStatusStore(state => state.setError);
+
     return useQuery({
         queryKey: queryKeys.status,
-        queryFn: api.getStatus,
+        queryFn: async () => {
+            try {
+                const data = await api.getStatus();
+                setStatus(data);
+                return data;
+            } catch (err: any) {
+                setError(err.message);
+                throw err;
+            }
+        },
         refetchInterval: 30000, // Refetch every 30 seconds
         staleTime: 10000,
     });
 }
-
 /**
  * Hook for analyzing a strategic query
  */
@@ -128,10 +140,14 @@ export function useDocuments() {
  */
 export function useUploadDocument() {
     const queryClient = useQueryClient();
+    const incrementDocCount = useStatusStore(state => state.incrementDocCount);
 
     return useMutation({
         mutationFn: (request: UploadDocumentRequest) => api.uploadDocument(request),
         onSuccess: () => {
+            // Optimistic update
+            incrementDocCount();
+
             queryClient.invalidateQueries({ queryKey: queryKeys.documents });
             queryClient.invalidateQueries({ queryKey: queryKeys.status });
         },
@@ -143,10 +159,14 @@ export function useUploadDocument() {
  */
 export function useDeleteDocument() {
     const queryClient = useQueryClient();
+    const decrementDocCount = useStatusStore(state => state.decrementDocCount);
 
     return useMutation({
         mutationFn: (id: string) => api.deleteDocument(id),
         onSuccess: () => {
+            // Optimistic update
+            decrementDocCount();
+
             queryClient.invalidateQueries({ queryKey: queryKeys.documents });
             queryClient.invalidateQueries({ queryKey: queryKeys.status });
         },

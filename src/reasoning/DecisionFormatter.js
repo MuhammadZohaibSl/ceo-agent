@@ -23,7 +23,7 @@ export class DecisionFormatter {
      * @returns {Promise<Object>} Formatted decision proposal
      */
     async format(params) {
-        const { query, options = [], evaluations = [], risks = {}, constraints = {}, missingData = [] } = params;
+        const { query, options = [], evaluations = [], risks = {}, constraints = {}, missingData = [], llmProvider = null } = params;
 
         this.log.debug('Formatting decision proposal', { optionCount: options.length });
 
@@ -72,6 +72,10 @@ export class DecisionFormatter {
             // Metadata
             optionsConsidered: options.length,
             generatedAt: new Date().toISOString(),
+
+            // LLM Provider info
+            llmProvider: llmProvider ?? 'unknown',
+            llmModel: llmProvider ?? 'unknown',
         };
 
         this.log.info('Decision proposal formatted', {
@@ -211,22 +215,23 @@ export class DecisionFormatter {
 
     /**
      * Calculate overall confidence
+     * Higher confidence when we have rich data from LLM
      * @private
      */
     _calculateConfidence(evaluations, missingData, risks) {
-        let confidence = 0.8; // Base confidence
+        let confidence = 0.75; // Base confidence
 
         // Reduce for missing data
-        confidence -= missingData.length * 0.1;
+        confidence -= missingData.length * 0.08;
 
         // Reduce for lack of options
         if (evaluations.length < 2) {
-            confidence -= 0.15;
+            confidence -= 0.12;
         }
 
         // Reduce for high aggregate risk
         if (risks.aggregateRisk?.overall > 0.7) {
-            confidence -= 0.15;
+            confidence -= 0.12;
         }
 
         // Reduce for policy violations
@@ -234,14 +239,24 @@ export class DecisionFormatter {
             (sum, e) => sum + (e.policyAlignment?.violations?.length ?? 0),
             0
         );
-        confidence -= violations * 0.1;
+        confidence -= violations * 0.08;
 
         // Boost for strong top recommendation
         if (evaluations[0]?.overallScore > 0.85) {
             confidence += 0.1;
+        } else if (evaluations[0]?.overallScore > 0.7) {
+            confidence += 0.05;
         }
 
-        return Math.max(0.1, Math.min(1, confidence));
+        // Boost for rich option data (has pros/cons/assumptions)
+        const topOption = evaluations[0]?.option;
+        if (topOption) {
+            if (topOption.pros?.length >= 2) confidence += 0.05;
+            if (topOption.cons?.length >= 2) confidence += 0.05;
+            if (topOption.assumptions?.length >= 1) confidence += 0.03;
+        }
+
+        return Math.max(0.2, Math.min(1, confidence));
     }
 
     /**

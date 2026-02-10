@@ -7,39 +7,64 @@
 import logger from '../utils/logger.js';
 
 /**
- * Optimized prompt for local LLMs - Short, focused, simple output format
- * CEOs make decisions by: Analyzing situation → Identifying options → Weighing tradeoffs → Deciding
+ * Enhanced CEO Decision-Making Prompt
+ * Generates comprehensive strategic options with all required fields
  */
-const OPTION_GENERATION_PROMPT = `You are a CEO. Answer this business question with 3 strategic options.
+const OPTION_GENERATION_PROMPT = `You are an experienced CEO advisor helping with strategic decisions.
 
-QUESTION: {{query}}
+## BUSINESS QUESTION
+{{query}}
 
-COMPANY INFO:
+## CONTEXT
 {{context}}
 
-BUDGET: {{budget}}
+## CONSTRAINTS
+- Budget: {{budget}}
+- Timeline: {{timeline}}
 
-Give exactly 3 options in this format:
+## YOUR TASK
+Analyze this question and provide exactly 3 strategic options. Be specific and realistic.
 
-OPTION 1: [Title]
-ACTION: [What to do in 1-2 sentences]
-COST: [Dollar amount]
+For each option, provide:
+1. A clear, actionable title
+2. Detailed description of what to do (2-3 sentences)
+3. Estimated cost in USD (give a specific number or range like "50000-100000")
+4. Risk level: low, medium, or high
+5. Implementation timeline
+6. 3 specific benefits of this approach
+7. 3 specific risks or drawbacks
+8. 2-3 key assumptions that must be true for success
+
+## RESPONSE FORMAT
+Respond in exactly this format:
+
+---OPTION 1---
+TITLE: [Clear action-oriented title]
+DESCRIPTION: [2-3 sentences explaining the approach]
+COST: [Number in USD, e.g., 150000]
 RISK: [low/medium/high]
-TIMELINE: [How long]
+TIMELINE: [e.g., 3-6 months]
+BENEFITS:
+- [Specific benefit 1]
+- [Specific benefit 2]
+- [Specific benefit 3]
+RISKS:
+- [Specific risk 1]
+- [Specific risk 2]
+- [Specific risk 3]
+ASSUMPTIONS:
+- [Key assumption 1]
+- [Key assumption 2]
 
-OPTION 2: [Title]
-ACTION: [What to do in 1-2 sentences]
-COST: [Dollar amount]
-RISK: [low/medium/high]
-TIMELINE: [How long]
+---OPTION 2---
+[Same format as above]
 
-OPTION 3: [Title]
-ACTION: [What to do in 1-2 sentences]
-COST: [Dollar amount]
-RISK: [low/medium/high]
-TIMELINE: [How long]
+---OPTION 3---
+[Same format as above]
 
-RECOMMENDATION: [Which option is best and why in 1 sentence]`;
+---RECOMMENDATION---
+BEST_OPTION: [1, 2, or 3]
+REASONING: [One paragraph explaining why this option is best]`;
 
 export class OptionGenerator {
     /**
@@ -59,7 +84,7 @@ export class OptionGenerator {
      * @param {Object[]} params.ragContext - Retrieved documents
      * @param {Object} params.constraints - Pre-decision constraints
      * @param {Object} params.decisionPolicy - CEO decision policy
-     * @returns {Promise<Object[]>} Generated options
+     * @returns {Promise<{options: Object[], provider: string}>} Generated options and provider used
      */
     async generate(params) {
         const { query, memory = [], ragContext = [], constraints = {}, decisionPolicy = {} } = params;
@@ -72,57 +97,68 @@ export class OptionGenerator {
         }
 
         // Otherwise, use rule-based generation
-        return this._generateRuleBased(params);
+        const options = this._generateRuleBased(params);
+        return { options, provider: 'rule-based' };
     }
 
     /**
      * Generate options using LLM
      * @private
+     * @returns {Promise<{options: Object[], provider: string}>}
      */
     async _generateWithLLM(params) {
-        const { query, memory, ragContext, constraints } = params;
+        const { query, memory, ragContext, constraints, preferredProvider } = params;
 
         // Build concise context for small LLMs
         const contextStr = this._buildContextString(memory, ragContext);
         const budget = constraints?.budgetLimit
             ? `$${constraints.budgetLimit.toLocaleString()}`
             : 'Flexible';
+        const timeline = constraints?.timeHorizon ?? '6-12 months';
 
-        // Build simplified prompt for local LLMs
+        // Build comprehensive prompt for OpenRouter LLMs
         const prompt = OPTION_GENERATION_PROMPT
             .replace('{{query}}', query)
-            .replace('{{context}}', contextStr || 'Growing tech company')
-            .replace('{{budget}}', budget);
+            .replace('{{context}}', contextStr || 'A growing technology company evaluating strategic decisions')
+            .replace('{{budget}}', budget)
+            .replace('{{timeline}}', timeline);
 
         try {
-            this.log.info('Sending prompt to LLM', { promptLength: prompt.length });
-            const response = await this.llmClient.generate(prompt);
+            this.log.info('Sending prompt to LLM', { promptLength: prompt.length, preferredProvider });
+            const llmResult = await this.llmClient.generate(prompt, { preferredProvider });
+
+            // Extract provider info from response (LLMRouter returns {response, provider, ...})
+            const actualProvider = llmResult?.provider ?? preferredProvider ?? 'unknown';
+            const responseContent = llmResult?.response ?? llmResult;
 
             // Log raw response for debugging
-            const responseStr = typeof response === 'object'
-                ? (response.response ?? response.content ?? JSON.stringify(response))
-                : response;
+            const responseStr = typeof responseContent === 'object'
+                ? (responseContent.response ?? responseContent.content ?? JSON.stringify(responseContent))
+                : responseContent;
             this.log.info('LLM raw response received', {
                 responseLength: responseStr?.length,
+                provider: actualProvider,
                 preview: responseStr?.substring(0, 200)
             });
 
-            const options = this._parseOptions(response);
+            const options = this._parseOptions(responseContent);
 
-            this.log.info('Options generated via LLM', { count: options.length });
+            this.log.info('Options generated via LLM', { count: options.length, provider: actualProvider });
 
             // If parsing failed, fall back to rules
             if (options.length === 0) {
                 this.log.warn('LLM response parsing yielded 0 options, using rules', {
                     rawResponse: responseStr?.substring(0, 500)
                 });
-                return this._generateRuleBased(params);
+                const ruleOptions = this._generateRuleBased(params);
+                return { options: ruleOptions, provider: 'rule-based' };
             }
 
-            return options;
+            return { options, provider: actualProvider };
         } catch (error) {
             this.log.error('LLM generation failed, falling back to rule-based', { error: error.message });
-            return this._generateRuleBased(params);
+            const ruleOptions = this._generateRuleBased(params);
+            return { options: ruleOptions, provider: 'rule-based' };
         }
     }
 
@@ -417,47 +453,54 @@ export class OptionGenerator {
     }
 
     /**
-     * Parse cost from various formats
+     * Parse cost from various formats (handles ranges like "50000-100000")
      * @private
      */
     _parseCost(value) {
         if (typeof value === 'number') return value;
         if (typeof value === 'string') {
+            // Handle ranges like "50000-100000" by taking the average
+            const rangeMatch = value.match(/(\d[\d,]*)\s*[-–to]+\s*(\d[\d,]*)/i);
+            if (rangeMatch) {
+                const low = parseFloat(rangeMatch[1].replace(/,/g, ''));
+                const high = parseFloat(rangeMatch[2].replace(/,/g, ''));
+                if (!isNaN(low) && !isNaN(high)) {
+                    return Math.round((low + high) / 2);
+                }
+            }
+            // Handle single values
             const num = parseFloat(value.replace(/[^0-9.]/g, ''));
-            return isNaN(num) ? 0 : num;
+            return isNaN(num) ? 0 : Math.round(num);
         }
         return 0;
     }
 
     /**
-     * Parse options from text format (for local LLMs that don't output JSON)
-     * Expected format:
-     * OPTION 1: [Title]
-     * ACTION: [Description]
-     * COST: [Amount]
-     * RISK: [low/medium/high]
-     * TIMELINE: [Duration]
+     * Parse options from text format (for LLMs that output structured text)
+     * Enhanced format includes BENEFITS, RISKS, and ASSUMPTIONS sections
      * @private
      */
     _parseTextOptions(text) {
         const options = [];
 
-        // Split by OPTION markers
-        const optionBlocks = text.split(/OPTION\s*\d+\s*:/i);
+        // Split by OPTION markers (handles both "---OPTION 1---" and "OPTION 1:")
+        const optionBlocks = text.split(/---OPTION\s*\d+---|OPTION\s*\d+\s*:/i);
 
         for (let i = 1; i < optionBlocks.length && options.length < 5; i++) {
             const block = optionBlocks[i];
 
-            // Extract title (text before first newline or before ACTION:)
-            const titleMatch = block.match(/^\s*([^\n]+?)(?=\n|ACTION:|$)/i);
+            // Extract TITLE
+            const titleMatch = block.match(/TITLE\s*:\s*([^\n]+)/i) ||
+                block.match(/^\s*([^\n]+?)(?=\n|DESCRIPTION:|ACTION:|$)/i);
             const title = titleMatch
-                ? titleMatch[1].trim().replace(/^[:\s-[\]]+/, '').replace(/[\]]+$/, '')
+                ? titleMatch[1].trim().replace(/^[:\s\-\[\]]+/, '').replace(/[\]]+$/, '').replace(/\*+/g, '')
                 : `Option ${i}`;
 
-            // Extract ACTION/description
-            const actionMatch = block.match(/ACTION\s*:\s*([^\n]+(?:\n(?!COST|RISK|TIMELINE)[^\n]+)*)/i);
-            const description = actionMatch
-                ? actionMatch[1].trim().replace(/\[|\]/g, '')
+            // Extract DESCRIPTION/ACTION
+            const descMatch = block.match(/DESCRIPTION\s*:\s*([^\n]+(?:\n(?!COST|RISK|TIMELINE|BENEFITS|ASSUMPTIONS)[^\n]+)*)/i) ||
+                block.match(/ACTION\s*:\s*([^\n]+(?:\n(?!COST|RISK|TIMELINE)[^\n]+)*)/i);
+            const description = descMatch
+                ? descMatch[1].trim().replace(/\[|\]/g, '').replace(/\*+/g, '')
                 : title;
 
             // Extract COST
@@ -465,42 +508,88 @@ export class OptionGenerator {
             const costStr = costMatch ? costMatch[1] : '0';
             const estimatedCost = this._parseCost(costStr);
 
-            // Extract RISK
+            // Extract RISK level
             const riskMatch = block.match(/RISK\s*:\s*(low|medium|high)/i);
             const riskLevel = riskMatch ? riskMatch[1].toLowerCase() : 'medium';
 
             // Extract TIMELINE
             const timeMatch = block.match(/TIMELINE\s*:\s*([^\n]+)/i);
             const timeToImplement = timeMatch
-                ? timeMatch[1].trim().replace(/\[|\]/g, '')
+                ? timeMatch[1].trim().replace(/\[|\]/g, '').replace(/\*+/g, '')
                 : 'Unknown';
+
+            // Extract BENEFITS (pros)
+            const benefits = this._extractListItems(block, 'BENEFITS');
+
+            // Extract RISKS (cons)
+            const risks = this._extractListItems(block, 'RISKS');
+
+            // Extract ASSUMPTIONS
+            const assumptions = this._extractListItems(block, 'ASSUMPTIONS');
 
             if (title && title.length > 2) {
                 options.push({
                     id: `opt_llm_${Date.now()}_${i}`,
                     title: title.substring(0, 100),
                     description: description.substring(0, 500),
-                    pros: [],
-                    cons: [],
+                    pros: benefits.length > 0 ? benefits : [],
+                    cons: risks.length > 0 ? risks : [],
                     estimatedCost,
                     timeToImplement,
                     riskLevel,
-                    assumptions: [],
+                    assumptions: assumptions.length > 0 ? assumptions : [],
                     generatedAt: new Date().toISOString(),
                     source: 'llm',
                 });
             }
         }
 
-        // Also try to extract recommendation if present
+        // Extract recommendation if present
         if (options.length > 0) {
-            const recMatch = text.match(/RECOMMENDATION\s*:\s*([^\n]+)/i);
+            const recMatch = text.match(/---RECOMMENDATION---|RECOMMENDATION\s*:/i);
             if (recMatch) {
-                options[0].recommendation = recMatch[1].trim();
+                const recSection = text.substring(recMatch.index);
+                const bestMatch = recSection.match(/BEST_OPTION\s*:\s*(\d)/i);
+                const reasonMatch = recSection.match(/REASONING\s*:\s*([^\n]+(?:\n(?!---|$)[^\n]+)*)/i);
+
+                if (bestMatch) {
+                    const bestOptionIndex = parseInt(bestMatch[1]) - 1;
+                    if (bestOptionIndex >= 0 && bestOptionIndex < options.length) {
+                        options[bestOptionIndex].isRecommended = true;
+                        if (reasonMatch) {
+                            options[bestOptionIndex].recommendationReason = reasonMatch[1].trim();
+                        }
+                    }
+                }
             }
         }
 
         return options;
+    }
+
+    /**
+     * Extract list items from a section (BENEFITS:, RISKS:, ASSUMPTIONS:)
+     * @private
+     */
+    _extractListItems(block, sectionName) {
+        const items = [];
+        const sectionRegex = new RegExp(`${sectionName}\\s*:([\\s\\S]*?)(?=\\n[A-Z]+:|---OPTION|---RECOMMENDATION|$)`, 'i');
+        const sectionMatch = block.match(sectionRegex);
+
+        if (sectionMatch) {
+            const lines = sectionMatch[1].split('\n');
+            for (const line of lines) {
+                // Match lines starting with -, *, or numbers
+                const itemMatch = line.match(/^\s*[-*•\d.]+\s*(.+)/i);
+                if (itemMatch) {
+                    const item = itemMatch[1].trim().replace(/\[|\]/g, '').replace(/\*+/g, '');
+                    if (item.length > 3) {
+                        items.push(item.substring(0, 200));
+                    }
+                }
+            }
+        }
+        return items.slice(0, 5); // Max 5 items per list
     }
 }
 

@@ -1,0 +1,20 @@
+{
+  "id": "apr_1770501912969_54m9mg",
+  "contextId": "67e290c5-6898-4f81-b7cc-70ca8f7d78dc",
+  "status": "pending",
+  "priority": "medium",
+  "requiredBy": "human",
+  "proposal": {
+    "recommendationTitle": "Strategic Internal Upskilling & Targeted External Hires",
+    "recommendationDescription": "Invest in comprehensive training programs for existing engineering talent to develop AI expertise, supplemented by hiring a small, highly experienced team of AI engineers for critical, specialized roles.",
+    "estimatedCost": 5000001000000,
+    "confidence": 0.5,
+    "riskLevel": "medium",
+    "alternativeCount": 2
+  },
+  "submittedAt": "2026-02-07T22:05:12.969Z",
+  "expiresAt": "2026-02-08T22:05:12.969Z",
+  "approver": null,
+  "approvalNotes": null,
+  "modifications": null
+}

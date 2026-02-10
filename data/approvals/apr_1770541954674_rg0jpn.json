@@ -1,0 +1,20 @@
+{
+  "id": "apr_1770541954674_rg0jpn",
+  "contextId": "6bf43c3d-aded-4aa1-b012-61473a1dd231",
+  "status": "pending",
+  "priority": "medium",
+  "requiredBy": "human",
+  "proposal": {
+    "recommendationTitle": "Hybrid Augmentation Strategy",
+    "recommendationDescription": "Invest in hiring key talent in strategic areas like AI ethics, AI integration specialists, and creative problem-solvers, while simultaneously leveraging AI for repetitive tasks and data analysis. This approach balances human ingenuity with AI efficiency.",
+    "estimatedCost": 5000001500000,
+    "confidence": 0.5,
+    "riskLevel": "medium",
+    "alternativeCount": 2
+  },
+  "submittedAt": "2026-02-08T09:12:34.674Z",
+  "expiresAt": "2026-02-09T09:12:34.674Z",
+  "approver": null,
+  "approvalNotes": null,
+  "modifications": null
+}

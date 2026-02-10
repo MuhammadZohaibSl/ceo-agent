@@ -12,11 +12,17 @@
     "server:legacy": "node src/server.js",
     "test": "node --test tests/"
   },
-  "keywords": ["ai", "agent", "ceo", "decision-support"],
+  "keywords": [
+    "ai",
+    "agent",
+    "ceo",
+    "decision-support"
+  ],
   "license": "MIT",
   "engines": {
     "node": ">=18.0.0"
   },
   "dependencies": {
+    "mongoose": "^9.1.6"
   }
 }

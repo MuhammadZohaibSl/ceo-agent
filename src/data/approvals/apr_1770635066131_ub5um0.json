@@ -1,0 +1,20 @@
+{
+  "id": "apr_1770635066131_ub5um0",
+  "contextId": "660278f0-34ae-496d-bfc8-25783e332b58",
+  "status": "pending",
+  "priority": "medium",
+  "requiredBy": "human",
+  "proposal": {
+    "recommendationTitle": "Establish an AI Center of Excellence",
+    "recommendationDescription": "This option involves establishing an AI Center of Excellence to develop and implement AI solutions across the company. The center will consist of a team of AI experts, data scientists, and business stakeholders who will identify opportunities for AI adoption, develop solutions, and provide training and support to business units. The center will focus on developing a range of AI applications, from chatbots to predictive analytics.",
+    "estimatedCost": 500000,
+    "confidence": 0.7700000000000001,
+    "riskLevel": "medium",
+    "alternativeCount": 2
+  },
+  "submittedAt": "2026-02-09T11:04:26.131Z",
+  "expiresAt": "2026-02-10T11:04:26.131Z",
+  "approver": null,
+  "approvalNotes": null,
+  "modifications": null
+}

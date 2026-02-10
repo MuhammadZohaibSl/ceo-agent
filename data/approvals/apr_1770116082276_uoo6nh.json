@@ -1,0 +1,20 @@
+{
+  "id": "apr_1770116082276_uoo6nh",
+  "contextId": "9029620d-1982-49d7-9de6-d06d7e2aa568",
+  "status": "pending",
+  "priority": "medium",
+  "requiredBy": "human",
+  "proposal": {
+    "recommendationTitle": "Expand to US market, partner with a local tech company and hire local talent. Cost: $750k. Risk: Med",
+    "recommendationDescription": "Expand to US market, partner with a local tech company and hire local talent. Cost: $750k. Risk: Medium. Timeline: 2 years. Recommendation: This is a balanced option that combines the benefits of both strategies, while keeping the costs and risks moderate. It allows us to adapt to the local market and culture, while maintaining our standards and vision.",
+    "estimatedCost": 750,
+    "confidence": 0.5,
+    "riskLevel": "medium",
+    "alternativeCount": 2
+  },
+  "submittedAt": "2026-02-03T10:54:42.276Z",
+  "expiresAt": "2026-02-04T10:54:42.276Z",
+  "approver": null,
+  "approvalNotes": null,
+  "modifications": null
+}

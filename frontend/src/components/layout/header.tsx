@@ -11,6 +11,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useStatus } from '@/hooks/use-api';
+import { useStatusStore } from '@/stores/status-store';
+import { SettingsPanel } from '@/components/settings/settings-panel';
 
 const navItems = [
   { href: '/', label: 'Analysis' },
@@ -21,7 +23,8 @@ const navItems = [
 
 export function Header() {
   const pathname = usePathname();
-  const { data: status, isLoading } = useStatus();
+  useStatus(); // Fetch status
+  const { status, isLoading } = useStatusStore();
   
   const getProviderStatus = () => {
     if (isLoading || !status) return 'loading';
@@ -62,21 +65,24 @@ export function Header() {
           })}
         </nav>
         
-        {/* Status Indicators */}
+        {/* Status Indicators and Settings */}
         <div className="flex items-center gap-2 md:gap-4">
+          {/* LLM Provider Selector */}
+          <SettingsPanel />
+          
+          <Separator orientation="vertical" className="h-4 md:h-6 hidden sm:block" />
+          
           <div className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm">
-            <span className="text-muted-foreground hidden sm:inline">LLM:</span>
+            <span className="text-muted-foreground hidden sm:inline">Status:</span>
             <Badge 
               variant={providerStatus === 'online' ? 'default' : providerStatus === 'loading' ? 'secondary' : 'destructive'}
               className="text-[10px] md:text-xs capitalize"
             >
               {isLoading ? '...' : providerStatus === 'online' 
-                ? `${status?.llm.availableProviders}`
+                ? `${status?.llm.availableProviders} active`
                 : 'Off'}
             </Badge>
           </div>
-          
-          <Separator orientation="vertical" className="h-4 md:h-6 hidden sm:block" />
           
           <div className="hidden sm:flex items-center gap-1.5 md:gap-2 text-xs md:text-sm">
             <span className="text-muted-foreground">Docs:</span>

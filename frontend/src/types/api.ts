@@ -186,3 +186,78 @@ export interface UploadDocumentRequest {
     content: string;
     type?: 'md' | 'txt' | 'json';
 }
+
+// ============================================================================
+// Feedback Types
+// ============================================================================
+
+// Feedback type enum
+export type FeedbackType = 'rating' | 'correction' | 'preference' | 'outcome';
+
+// Outcome status enum
+export type OutcomeStatus = 'success' | 'partial_success' | 'failure' | 'abandoned' | 'unknown';
+
+// Rating request
+export interface RatingRequest {
+    contextId: string;
+    rating: 1 | 2 | 3 | 4 | 5;
+    comment?: string;
+    ratedBy?: string;
+}
+
+// Correction request
+export interface CorrectionRequest {
+    contextId: string;
+    field: string;
+    originalValue: unknown;
+    correctedValue: unknown;
+    reason?: string;
+    correctedBy?: string;
+}
+
+// Outcome request
+export interface OutcomeRequest {
+    contextId: string;
+    status: OutcomeStatus;
+    metrics?: Record<string, number | string>;
+    notes?: string;
+    recordedBy?: string;
+}
+
+// Feedback item (returned from API)
+export interface FeedbackItem {
+    id: string;
+    type: FeedbackType;
+    contextId: string;
+    timestamp: string;
+    // Rating-specific
+    rating?: number;
+    comment?: string;
+    ratedBy?: string;
+    // Correction-specific
+    field?: string;
+    originalValue?: unknown;
+    correctedValue?: unknown;
+    reason?: string;
+    correctedBy?: string;
+    // Outcome-specific
+    status?: OutcomeStatus;
+    metrics?: Record<string, number | string>;
+    notes?: string;
+    recordedBy?: string;
+}
+
+// Feedback statistics
+export interface FeedbackStats {
+    totalFeedback: number;
+    averageRating: number;
+    outcomeDistribution: Record<OutcomeStatus, number>;
+}
+
+// Learning insights
+export interface LearningInsights {
+    commonCorrections: { field: string; count: number }[];
+    preferencePatterns: Record<string, unknown>;
+    successFactors: string[];
+    improvementAreas: string[];
+}

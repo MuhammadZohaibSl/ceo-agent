@@ -20,7 +20,7 @@ const DEFAULTS = {
     similarityThreshold: 0.85,
   },
   llm: {
-    defaultProvider: 'claude',
+    defaultProvider: 'groq',
     timeout: 30000,
     maxRetries: 3,
   },
@@ -33,12 +33,12 @@ const DEFAULTS = {
  */
 function loadPolicy(filename) {
   const policyPath = join(ROOT_DIR, 'policies', filename);
-  
+
   if (!existsSync(policyPath)) {
     console.warn(`Policy file not found: ${filename}, using defaults`);
     return {};
   }
-  
+
   try {
     const content = readFileSync(policyPath, 'utf-8');
     return JSON.parse(content);
@@ -68,34 +68,26 @@ const config = {
     confidenceThreshold: parseFloat(env('AGENT_CONFIDENCE_THRESHOLD', DEFAULTS.agent.confidenceThreshold)),
     similarityThreshold: parseFloat(env('AGENT_SIMILARITY_THRESHOLD', DEFAULTS.agent.similarityThreshold)),
   },
-  
+
   // LLM settings
   llm: {
     defaultProvider: env('LLM_DEFAULT_PROVIDER', DEFAULTS.llm.defaultProvider),
     timeout: parseInt(env('LLM_TIMEOUT', DEFAULTS.llm.timeout)),
     maxRetries: parseInt(env('LLM_MAX_RETRIES', DEFAULTS.llm.maxRetries)),
     providers: {
-      claude: {
-        apiKey: env('CLAUDE_API_KEY'),
-        model: env('CLAUDE_MODEL', 'claude-3-5-sonnet-20241022'),
-      },
-      openai: {
-        apiKey: env('OPENAI_API_KEY'),
-        model: env('OPENAI_MODEL', 'gpt-4-turbo'),
-      },
-      gemini: {
-        apiKey: env('GEMINI_API_KEY'),
-        model: env('GEMINI_MODEL', 'gemini-pro'),
+      groq: {
+        apiKey: env('GROQ_API_KEY'),
+        model: env('GROQ_MODEL', 'llama-3.3-70b-versatile'),
       },
     },
   },
-  
+
   // Policies (loaded from files)
   policies: {
     decision: loadPolicy('default.decision.json'),
     context: loadPolicy('default.context.json'),
   },
-  
+
   // Paths
   paths: {
     root: ROOT_DIR,
@@ -111,13 +103,13 @@ const config = {
  */
 export function validateConfig() {
   const errors = [];
-  
+
   // Check at least one LLM provider is configured
   const hasProvider = Object.values(config.llm.providers).some(p => p.apiKey);
   if (!hasProvider) {
     errors.push('At least one LLM provider API key must be configured');
   }
-  
+
   // Check decision policy has required fields
   const requiredPolicyFields = ['riskAppetite', 'ethicalRedLines'];
   for (const field of requiredPolicyFields) {
@@ -125,7 +117,7 @@ export function validateConfig() {
       errors.push(`Decision policy missing required field: ${field}`);
     }
   }
-  
+
   return {
     valid: errors.length === 0,
     errors,
@@ -141,14 +133,14 @@ export function validateConfig() {
 export function get(path, defaultValue = undefined) {
   const keys = path.split('.');
   let value = config;
-  
+
   for (const key of keys) {
     if (value === undefined || value === null) {
       return defaultValue;
     }
     value = value[key];
   }
-  
+
   return value ?? defaultValue;
 }
 

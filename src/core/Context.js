@@ -29,14 +29,18 @@ export class Context {
      * @param {Object} params.constraints - Pre-decision constraints
      * @param {Object} params.decisionPolicy - CEO decision policy
      * @param {Object} params.contextPolicy - RAG context policy
+     * @param {string} params.preferredProvider - Preferred LLM provider
      */
-    constructor({ query, constraints = {}, decisionPolicy = {}, contextPolicy = {} }) {
+    constructor({ query, constraints = {}, decisionPolicy = {}, contextPolicy = {}, preferredProvider = null }) {
         // Immutable ID and timestamp
         this.id = randomUUID();
         this.createdAt = new Date().toISOString();
 
         // Input
         this.query = query;
+
+        // LLM preference (null means auto/router decides)
+        this.preferredProvider = preferredProvider;
 
         // Policies (frozen to prevent mutation)
         this.decisionPolicy = Object.freeze({ ...decisionPolicy });
@@ -67,6 +71,7 @@ export class Context {
             missingData: [],
             errors: [],
             auditLog: [],
+            llmProvider: null,  // Track which LLM provider was used
         };
     }
 
@@ -200,6 +205,19 @@ export class Context {
     addMissingData(fields) {
         this._state.missingData.push(...fields);
         this._logAudit('missing_data_identified', { fields });
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // LLM Provider Tracking
+    // ─────────────────────────────────────────────────────────────
+
+    get llmProvider() {
+        return this._state.llmProvider;
+    }
+
+    setLLMProvider(provider) {
+        this._state.llmProvider = provider;
+        this._logAudit('llm_provider_used', { provider });
     }
 
     // ─────────────────────────────────────────────────────────────

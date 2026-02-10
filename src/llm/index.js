@@ -7,6 +7,5 @@ export { LLMRouter, RoutingStrategy, createLLMRouter } from './LLMRouter.js';
 export { HealthTracker } from './HealthTracker.js';
 
 // Providers
-export { OpenAIClient } from './providers/OpenAIClient.js';
-export { AnthropicClient } from './providers/AnthropicClient.js';
-export { OllamaClient } from './providers/OllamaClient.js';
+export { OpenRouterClient } from './providers/OpenRouterClient.js';
+export { GroqClient } from './providers/GroqClient.js';

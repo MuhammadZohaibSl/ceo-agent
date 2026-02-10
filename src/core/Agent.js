@@ -47,6 +47,7 @@ export class Agent {
      * @param {string} query - User query
      * @param {Object} options - Request options
      * @param {Object} options.constraints - Pre-decision constraints from human
+     * @param {string} options.preferredProvider - Preferred LLM provider
      * @returns {Promise<Object>} Decision proposal
      */
     async process(query, options = {}) {
@@ -58,6 +59,7 @@ export class Agent {
             constraints: options.constraints ?? {},
             decisionPolicy: config.policies.decision,
             contextPolicy: config.policies.context,
+            preferredProvider: options.preferredProvider ?? null,
         });
 
         // Execute lifecycle

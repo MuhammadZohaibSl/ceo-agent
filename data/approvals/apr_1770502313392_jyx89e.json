@@ -1,0 +1,20 @@
+{
+  "id": "apr_1770502313392_jyx89e",
+  "contextId": "fb643ca0-4377-4fe2-8c8a-f04e74ecae33",
+  "status": "pending",
+  "priority": "medium",
+  "requiredBy": "human",
+  "proposal": {
+    "recommendationTitle": "Strategic Partnership and Distribution",
+    "recommendationDescription": "Identify and partner with an established European distributor or reseller who has existing market access and customer relationships. This leverages their infrastructure and expertise to accelerate our market penetration.",
+    "estimatedCost": 20000005000000,
+    "confidence": 0.6000000000000001,
+    "riskLevel": "medium",
+    "alternativeCount": 2
+  },
+  "submittedAt": "2026-02-07T22:11:53.393Z",
+  "expiresAt": "2026-02-08T22:11:53.393Z",
+  "approver": null,
+  "approvalNotes": null,
+  "modifications": null
+}

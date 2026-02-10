@@ -11,6 +11,7 @@ import { RecommendationCard } from './recommendation-card';
 import { AlternativesList } from './alternatives-list';
 import { RiskAssessmentDisplay } from './risk-assessment';
 import { ConfidenceMeter } from './confidence-meter';
+import { FeedbackPanel } from '@/components/feedback';
 
 export function AnalysisResults() {
   const { currentResult, isAnalyzing, error } = useQueryStore();
@@ -86,10 +87,21 @@ export function AnalysisResults() {
     );
   }
   
-  const { proposal } = currentResult;
+  const { id, proposal } = currentResult;
   
   return (
     <div className="space-y-4">
+      {/* LLM Model Badge */}
+      {proposal.llmModel && (
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <span className="px-2 py-1 rounded-md bg-primary/10 text-primary font-medium">
+            🤖 {proposal.llmModel}
+          </span>
+          <span>•</span>
+          <span>Generated at {new Date(proposal.generatedAt).toLocaleTimeString()}</span>
+        </div>
+      )}
+      
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Left Column - Main content */}
@@ -116,6 +128,9 @@ export function AnalysisResults() {
           
           {/* Risk Assessment */}
           <RiskAssessmentDisplay risks={proposal.risks} />
+          
+          {/* Feedback Panel */}
+          <FeedbackPanel contextId={id} compact />
         </div>
       </div>
     </div>

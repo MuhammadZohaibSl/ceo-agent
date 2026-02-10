@@ -176,6 +176,24 @@ export class RAGEngine {
     }
 
     /**
+     * Remove a document from the engine
+     * @param {string} documentId - Document ID to remove
+     * @returns {number} Number of chunks removed
+     */
+    removeDocument(documentId) {
+        this.log.debug('Removing document from RAG', { documentId });
+        const removedCount = this.vectorStore.deleteByDocument(documentId);
+
+        this.log.info('Document removed from RAG', {
+            documentId,
+            removedCount,
+            stats: this.vectorStore.getStats()
+        });
+
+        return removedCount;
+    }
+
+    /**
      * Clear all indexed data
      */
     clear() {

@@ -1,0 +1,20 @@
+{
+  "id": "apr_1770714987948_71zajr",
+  "contextId": "a6d40fb7-f948-4a75-9d20-0f8fcd081ecf",
+  "status": "pending",
+  "priority": "medium",
+  "requiredBy": "human",
+  "proposal": {
+    "recommendationTitle": "Partner with an AI Service Provider",
+    "recommendationDescription": "Collaborate with an external AI service provider to leverage their expertise and technology. This partnership can accelerate the implementation of AI solutions without the need for significant internal investment in talent and infrastructure. The provider will offer tailored solutions based on the company's specific needs.",
+    "estimatedCost": 400000,
+    "confidence": 0.7700000000000001,
+    "riskLevel": "medium",
+    "alternativeCount": 2
+  },
+  "submittedAt": "2026-02-10T09:16:27.948Z",
+  "expiresAt": "2026-02-11T09:16:27.948Z",
+  "approver": null,
+  "approvalNotes": null,
+  "modifications": null
+}
