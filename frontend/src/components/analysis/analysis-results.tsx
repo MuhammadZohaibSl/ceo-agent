@@ -98,7 +98,7 @@ export function AnalysisResults() {
             🤖 {proposal.llmModel}
           </span>
           <span>•</span>
-          <span>Generated at {new Date(proposal.generatedAt).toLocaleTimeString()}</span>
+          <span>Generated at {new Date(proposal.generatedAt ?? Date.now()).toLocaleTimeString()}</span>
         </div>
       )}
       

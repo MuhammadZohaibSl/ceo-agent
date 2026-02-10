@@ -65,6 +65,8 @@ export interface Proposal {
     requiresHumanApproval: boolean;
     approvalReason?: string;
     missingData?: string[];
+    llmModel?: string;
+    generatedAt?: string;
 }
 
 // Analysis result
