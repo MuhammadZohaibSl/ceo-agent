@@ -4,7 +4,7 @@
  */
 
 import { handleCORS, handleNotFound } from '../middleware/index.js';
-import { statusController, analysisController, approvalsController, documentsController } from '../controllers/index.js';
+import { statusController, analysisController, approvalsController, documentsController, settingsController } from '../controllers/index.js';
 import logger from '../../utils/logger.js';
 
 /**
@@ -34,6 +34,10 @@ const routes = [
     // Document routes (static paths)
     { method: 'GET', path: '/api/documents', handler: documentsController.getDocuments },
     { method: 'POST', path: '/api/documents', handler: documentsController.uploadDocument },
+
+    // Settings routes
+    { method: 'GET', path: '/api/settings/llm', handler: settingsController.getLLMSettings },
+    { method: 'PUT', path: '/api/settings/llm', handler: settingsController.updateLLMSettings },
 ];
 
 /**
