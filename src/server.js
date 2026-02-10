@@ -1185,7 +1185,7 @@ async function handleRequest(req, res) {
 // Server Startup
 // ============================================================================
 
-const PORT = parseInt(process.env.API_PORT, 10) || 3001;
+const PORT = parseInt(process.env.PORT || process.env.API_PORT, 10) || 3001;
 
 async function startServer() {
     await initializeAgent();

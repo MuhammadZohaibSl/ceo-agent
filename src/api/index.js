@@ -30,7 +30,7 @@ if (existsSync(envPath)) {
 import agentService from './services/agent.service.js';
 import handleRequest from './routes/index.js';
 
-const PORT = parseInt(process.env.API_PORT, 10) || 3001;
+const PORT = parseInt(process.env.PORT || process.env.API_PORT, 10) || 3001;
 
 /**
  * Print startup banner
