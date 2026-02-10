@@ -11,7 +11,9 @@ import logger from '../../utils/logger.js';
  * Parse URL into parts for route matching
  */
 function parseUrl(url) {
-    const [path, query] = url.split('?');
+    const [rawPath, query] = url.split('?');
+    // Normalize double slashes (e.g. //api/... -> /api/...)
+    const path = rawPath.replace(/\/\/+/g, '/');
     const parts = path.split('/').filter(Boolean);
     return { path, parts, query };
 }
@@ -36,8 +38,8 @@ const routes = [
     { method: 'POST', path: '/api/documents', handler: documentsController.uploadDocument },
 
     // Settings routes
-    { method: 'GET', path: 'api/settings/llm', handler: settingsController.getLLMSettings },
-    { method: 'PUT', path: 'api/settings/llm', handler: settingsController.updateLLMSettings },
+    { method: 'GET', path: '/api/settings/llm', handler: settingsController.getLLMSettings },
+    { method: 'PUT', path: '/api/settings/llm', handler: settingsController.updateLLMSettings },
 ];
 
 /**
