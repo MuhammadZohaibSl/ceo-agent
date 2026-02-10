@@ -36,8 +36,8 @@ const routes = [
     { method: 'POST', path: '/api/documents', handler: documentsController.uploadDocument },
 
     // Settings routes
-    { method: 'GET', path: '/api/settings/llm', handler: settingsController.getLLMSettings },
-    { method: 'PUT', path: '/api/settings/llm', handler: settingsController.updateLLMSettings },
+    { method: 'GET', path: 'api/settings/llm', handler: settingsController.getLLMSettings },
+    { method: 'PUT', path: 'api/settings/llm', handler: settingsController.updateLLMSettings },
 ];
 
 /**
