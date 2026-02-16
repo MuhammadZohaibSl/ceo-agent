@@ -10,9 +10,11 @@ import { usePathname } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { cn } from '@/lib/utils';
 import { useStatus } from '@/hooks/use-api';
 import { useStatusStore } from '@/stores/status-store';
 import { SettingsPanel } from '@/components/settings/settings-panel';
+import { ModeToggle } from '@/components/mode-toggle';
 
 const navItems = [
   { href: '/', label: 'Analysis' },
@@ -36,7 +38,7 @@ export function Header() {
   const providerStatus = getProviderStatus();
   
   return (
-    <header className="h-14 md:h-16 border-b border-border/40 bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+    <header className="h-14 md:h-16 border-b border-border/40 bg-background/80 backdrop-blur-md sticky top-0 z-50">
       <div className="h-full px-4 md:px-6 flex items-center justify-between">
         {/* Logo and Title */}
         <Link href="/" className="flex items-center gap-2 md:gap-3 hover:opacity-80 transition-opacity">
@@ -52,11 +54,11 @@ export function Header() {
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             return (
-              <Link key={item.href} href={item.href}>
+              <Link key={item.href} href={item.href} aria-current={isActive ? 'page' : undefined}>
                 <Button
                   variant={isActive ? 'secondary' : 'ghost'}
                   size="sm"
-                  className={isActive ? '' : 'text-muted-foreground hover:text-foreground'}
+                  className={cn(isActive ? '' : 'text-muted-foreground hover:text-foreground')}
                 >
                   {item.label}
                 </Button>
@@ -69,6 +71,7 @@ export function Header() {
         <div className="flex items-center gap-2 md:gap-4">
           {/* LLM Provider Selector */}
           <SettingsPanel />
+          <ModeToggle />
           
           <Separator orientation="vertical" className="h-4 md:h-6 hidden sm:block" />
           
@@ -76,18 +79,18 @@ export function Header() {
             <span className="text-muted-foreground hidden sm:inline">Status:</span>
             <Badge 
               variant={providerStatus === 'online' ? 'default' : providerStatus === 'loading' ? 'secondary' : 'destructive'}
-              className="text-[10px] md:text-xs capitalize"
+              className="text-[10px] md:text-xs capitalize tabular-nums"
             >
-              {isLoading ? '...' : providerStatus === 'online' 
+              {isLoading ? '…' : providerStatus === 'online' 
                 ? `${status?.llm.availableProviders} active`
-                : 'Off'}
+                : 'Offline'}
             </Badge>
           </div>
           
           <div className="hidden sm:flex items-center gap-1.5 md:gap-2 text-xs md:text-sm">
             <span className="text-muted-foreground">Docs:</span>
-            <Badge variant="secondary" className="text-[10px] md:text-xs">
-              {isLoading ? '...' : status?.rag.vectorStore.uniqueDocuments || 0}
+            <Badge variant="secondary" className="text-[10px] md:text-xs tabular-nums">
+              {isLoading ? '…' : status?.rag.vectorStore.uniqueDocuments || 0}
             </Badge>
           </div>
         </div>

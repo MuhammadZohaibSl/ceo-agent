@@ -43,6 +43,7 @@ function printBanner() {
     console.log('\nEndpoints:');
     console.log('  GET  /api/status            - Agent status');
     console.log('  POST /api/analyze           - Process strategic query');
+    console.log('  POST /api/chat              - Artifact chatbot (LLM + RAG)');
     console.log('  GET  /api/approvals         - List pending approvals');
     console.log('  GET  /api/approvals/:id     - Get approval details');
     console.log('  POST /api/approvals/:id/approve - Approve decision');

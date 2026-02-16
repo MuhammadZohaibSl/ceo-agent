@@ -1,0 +1,20 @@
+{
+  "id": "apr_1770890959453_jf03f6",
+  "contextId": "0d6941a6-15a1-4804-98f9-de66e6f4c015",
+  "status": "pending",
+  "priority": "medium",
+  "requiredBy": "human",
+  "proposal": {
+    "recommendationTitle": "Establish AI Exploration Team",
+    "recommendationDescription": "Assemble a team of experts to explore AI technologies, assess their potential impact on the business, and develop a strategic roadmap for adoption. This team will conduct market research, engage with AI vendors, and build prototypes to test AI-driven solutions. The team will also develop a comprehensive report outlining the opportunities, challenges, and recommendations for AI adoption.",
+    "estimatedCost": 200000,
+    "confidence": 0.6900000000000002,
+    "riskLevel": "medium",
+    "alternativeCount": 2
+  },
+  "submittedAt": "2026-02-12T10:09:19.453Z",
+  "expiresAt": "2026-02-13T10:09:19.453Z",
+  "approver": null,
+  "approvalNotes": null,
+  "modifications": null
+}

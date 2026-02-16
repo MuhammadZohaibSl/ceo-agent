@@ -4,7 +4,7 @@
  */
 
 import { handleCORS, handleNotFound } from '../middleware/index.js';
-import { statusController, analysisController, approvalsController, documentsController, settingsController } from '../controllers/index.js';
+import { statusController, analysisController, approvalsController, documentsController, settingsController, chatController } from '../controllers/index.js';
 import logger from '../../utils/logger.js';
 
 /**
@@ -29,6 +29,9 @@ const routes = [
 
     // Analysis routes
     { method: 'POST', path: '/api/analyze', handler: analysisController.analyze },
+
+    // Chat routes
+    { method: 'POST', path: '/api/chat', handler: chatController.chat },
 
     // Approval routes (static paths)
     { method: 'GET', path: '/api/approvals', handler: approvalsController.getApprovals },

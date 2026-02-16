@@ -21,6 +21,14 @@ import type {
     FeedbackItem,
     FeedbackStats,
     LearningInsights,
+    PipelineState,
+    PipelineSummary,
+    StartPipelineRequest,
+    EditArtifactRequest,
+    CommentRequest,
+    ArtifactComment,
+    ChatRequest,
+    ChatResponse,
 } from '@/types/api';
 
 // API base URL - configurable via environment variable
@@ -471,7 +479,83 @@ export const api = {
     // Settings
     getLLMSettings,
     updateLLMSettings,
+    // Pipeline
+    startPipeline,
+    getPipeline,
+    listPipelines,
+    executeNextStep,
+    approveStep,
+    rejectStep,
+    editArtifact,
+    commentOnArtifact,
+    chatWithArtifact,
 };
 
 export default api;
+
+// ============================================================================
+// Pipeline API Functions
+// ============================================================================
+
+async function startPipeline(data: StartPipelineRequest): Promise<ApiResponse<PipelineState>> {
+    const response = await apiClient.post<ApiResponse<PipelineState>>('/api/pipeline/start', data);
+    return response.data;
+}
+
+async function getPipeline(id: string): Promise<ApiResponse<PipelineState>> {
+    const response = await apiClient.get<ApiResponse<PipelineState>>(`/api/pipeline/${id}`);
+    return response.data;
+}
+
+async function listPipelines(): Promise<ApiResponse<PipelineSummary[]>> {
+    const response = await apiClient.get<ApiResponse<PipelineSummary[]>>('/api/pipeline');
+    return response.data;
+}
+
+async function executeNextStep(id: string): Promise<ApiResponse<PipelineState>> {
+    const response = await apiClient.post<ApiResponse<PipelineState>>(`/api/pipeline/${id}/next`);
+    return response.data;
+}
+
+async function approveStep(id: string, stepId: string, notes?: string): Promise<ApiResponse<PipelineState>> {
+    const response = await apiClient.post<ApiResponse<PipelineState>>(
+        `/api/pipeline/${id}/step/${stepId}/approve`,
+        { notes }
+    );
+    return response.data;
+}
+
+async function rejectStep(id: string, stepId: string, feedback?: string): Promise<ApiResponse<PipelineState>> {
+    const response = await apiClient.post<ApiResponse<PipelineState>>(
+        `/api/pipeline/${id}/step/${stepId}/reject`,
+        { feedback }
+    );
+    return response.data;
+}
+
+async function editArtifact(id: string, stepId: string, data: EditArtifactRequest): Promise<ApiResponse<PipelineState>> {
+    const response = await apiClient.put<ApiResponse<PipelineState>>(
+        `/api/pipeline/${id}/step/${stepId}/artifact`,
+        data
+    );
+    return response.data;
+}
+
+async function commentOnArtifact(
+    id: string, stepId: string, data: CommentRequest
+): Promise<ApiResponse<{ comment: ArtifactComment; pipeline: PipelineState }>> {
+    const response = await apiClient.post<ApiResponse<{ comment: ArtifactComment; pipeline: PipelineState }>>(
+        `/api/pipeline/${id}/step/${stepId}/comment`,
+        data
+    );
+    return response.data;
+}
+
+export async function chatWithArtifact(data: ChatRequest): Promise<ChatResponse> {
+    const response = await apiClient.post<ApiResponse<ChatResponse>>('/api/chat', data);
+    if (!response.data.success || !response.data.data) {
+        throw new Error(response.data.error || 'Chat request failed');
+    }
+    return response.data.data;
+}
 

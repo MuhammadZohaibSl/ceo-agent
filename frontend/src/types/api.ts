@@ -67,6 +67,7 @@ export interface Proposal {
     missingData?: string[];
     llmModel?: string;
     generatedAt?: string;
+    artifacts?: Record<string, StepArtifact>; // Map of section ID to artifact data
 }
 
 // Analysis result
@@ -262,4 +263,130 @@ export interface LearningInsights {
     preferencePatterns: Record<string, unknown>;
     successFactors: string[];
     improvementAreas: string[];
+}
+
+// ============================================================================
+// Pipeline Types
+// ============================================================================
+
+export type PipelineStepStatus = 'pending' | 'running' | 'completed' | 'approved' | 'rejected';
+export type PipelineStatus = 'active' | 'completed' | 'cancelled';
+
+export interface StepResult {
+    stepId: string;
+    content: string;
+    keyFindings: string[];
+    risks: string[];
+    recommendations: string[];
+    score: number;
+    provider?: string;
+    generatedAt: string;
+}
+
+export interface ArtifactEdit {
+    id: string;
+    lineIndex: number;
+    originalContent: string;
+    newContent: string;
+    editedAt: string;
+}
+
+export interface ArtifactComment {
+    id: string;
+    lineIndex: number;
+    text: string;
+    author: string;
+    createdAt: string;
+    resolved: boolean;
+}
+
+export interface StepArtifact {
+    lines: string[];
+    edits: ArtifactEdit[];
+    comments: ArtifactComment[];
+}
+
+export interface ReviewFeedback {
+    action: 'approved' | 'rejected';
+    notes: string;
+}
+
+export interface PipelineStep {
+    id: string;
+    name: string;
+    icon: string;
+    description: string;
+    status: PipelineStepStatus;
+    result: StepResult | null;
+    artifact: StepArtifact | null;
+    reviewFeedback: ReviewFeedback | null;
+    startedAt: string | null;
+    completedAt: string | null;
+    approvedAt: string | null;
+}
+
+export interface PipelineState {
+    id: string;
+    query: string;
+    constraints: Constraints;
+    status: PipelineStatus;
+    currentStepIndex: number;
+    steps: PipelineStep[];
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface PipelineSummary {
+    id: string;
+    query: string;
+    status: PipelineStatus;
+    currentStepIndex: number;
+    completedSteps: number;
+    totalSteps: number;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface StartPipelineRequest {
+    query: string;
+    constraints?: Constraints;
+    provider?: string;
+}
+
+export interface EditArtifactRequest {
+    lineIndex: number;
+    content: string;
+}
+
+export interface CommentRequest {
+    lineIndex: number;
+    text: string;
+    author?: string;
+}
+
+// ============================================================================
+// Chat API Types
+// ============================================================================
+
+export type ChatAction = 'explain' | 'refine' | 'edit' | 'general';
+
+export interface ChatMessage {
+    role: 'user' | 'ai';
+    content: string;
+}
+
+export interface ChatRequest {
+    selectedText: string;
+    action?: ChatAction;
+    userMessage?: string;
+    conversationHistory?: ChatMessage[];
+}
+
+export interface ChatResponse {
+    reply: string;
+    provider: string;
+    suggestedEdit: string | null;
+    action: ChatAction;
+    latencyMs: number;
+    hasDocumentContext: boolean;
 }

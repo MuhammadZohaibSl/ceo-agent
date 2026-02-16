@@ -9,6 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 
+import { HighlightText } from '@/components/ui/highlight-text';
+
 interface ConfidenceMeterProps {
   confidence: number;
   confidenceLevel: string;
@@ -77,9 +79,9 @@ export function ConfidenceMeter({
               <span className="text-sm font-medium text-amber-500">Requires Human Approval</span>
             </div>
             {approvalReason && (
-              <p className="text-xs text-amber-500/70 ml-6">
-                {approvalReason}
-              </p>
+              <div className="text-xs text-amber-500/70 ml-6">
+                <HighlightText text={approvalReason} />
+              </div>
             )}
           </div>
         )}

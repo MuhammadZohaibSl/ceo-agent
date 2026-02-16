@@ -32,6 +32,7 @@ import { createAgent } from './core/Agent.js';
 import { createMemoryManager } from './memory/index.js';
 import { createRAGEngine } from './rag/index.js';
 import { OptionGenerator, OptionEvaluator, RiskModel, DecisionFormatter } from './reasoning/index.js';
+import { AnalysisPipeline } from './reasoning/AnalysisPipeline.js';
 import { createLLMRouter, OpenRouterClient, GroqClient, RoutingStrategy } from './llm/index.js';
 import { createSafetyGuard } from './safety/index.js';
 import { createAuditLogger, createApprovalManager, createFeedbackCollector } from './audit/index.js';
@@ -41,6 +42,9 @@ import { createTimelineManager } from './timeline/index.js';
 import config, { validateConfig } from './config/index.js';
 import logger from './utils/logger.js';
 import { connectDB, disconnectDB, isDBConnected, Settings, Document } from './db/index.js';
+// Chat controller uses agentService singleton — we hydrate it with our local instances
+import agentService from './api/services/agent.service.js';
+import { chatController } from './api/controllers/index.js';
 
 // ============================================================================
 // Agent Initialization
@@ -56,6 +60,7 @@ let ragEngine = null;
 let okrManager = null;
 let visionEngine = null;
 let timelineManager = null;
+let analysisPipeline = null;
 
 // LLM Settings (user preferences)
 let llmSettings = {
@@ -202,6 +207,16 @@ async function initializeAgent() {
         decisionFormatter,
         safetyGuard,
     });
+
+    // Initialize Analysis Pipeline
+    analysisPipeline = new AnalysisPipeline({
+        llmClient: llmRouter,
+        ragEngine,
+        memoryManager,
+    });
+
+    // Hydrate agentService singleton so chat controller can access our llmRouter & ragEngine
+    agentService.hydrate({ llmRouter, ragEngine, agent });
 
     logger.info('Agent ready for HTTP requests', agent.getStatus());
 }
@@ -941,6 +956,132 @@ async function handleUpdateLLMSettings(req, res) {
 }
 
 // ============================================================================
+// Pipeline API Handlers
+// ============================================================================
+
+// POST /api/pipeline/start - Start a new analysis pipeline
+async function handleStartPipeline(req, res) {
+    const body = await getBody(req);
+    const data = parseJSON(body);
+
+    if (!data || !data.query) {
+        return sendJSON(res, 400, { success: false, error: 'Missing required field: query' });
+    }
+
+    try {
+        let preferredProvider = data.provider ?? llmSettings.defaultProvider;
+        if (preferredProvider === 'auto') {
+            preferredProvider = null;
+        }
+
+        const pipeline = analysisPipeline.startPipeline(
+            data.query,
+            data.constraints ?? {},
+            preferredProvider
+        );
+
+        sendJSON(res, 201, { success: true, data: pipeline });
+    } catch (error) {
+        logger.error('Failed to start pipeline', { error: error.message });
+        sendJSON(res, 500, { success: false, error: error.message });
+    }
+}
+
+// GET /api/pipeline/:id - Get pipeline status
+async function handleGetPipeline(req, res, pipelineId) {
+    const pipeline = analysisPipeline.getPipeline(pipelineId);
+    if (!pipeline) {
+        return sendJSON(res, 404, { success: false, error: 'Pipeline not found' });
+    }
+    sendJSON(res, 200, { success: true, data: pipeline });
+}
+
+// GET /api/pipeline - List all pipelines
+async function handleListPipelines(req, res) {
+    const pipelines = analysisPipeline.listPipelines();
+    sendJSON(res, 200, { success: true, data: pipelines });
+}
+
+// POST /api/pipeline/:id/next - Execute next step
+async function handlePipelineNext(req, res, pipelineId) {
+    try {
+        const pipeline = await analysisPipeline.executeNextStep(pipelineId);
+        sendJSON(res, 200, { success: true, data: pipeline });
+    } catch (error) {
+        logger.error('Pipeline step execution failed', { error: error.message });
+        sendJSON(res, 400, { success: false, error: error.message });
+    }
+}
+
+// POST /api/pipeline/:id/step/:step/approve - Approve a step
+async function handlePipelineApprove(req, res, pipelineId, stepId) {
+    const body = await getBody(req);
+    const data = parseJSON(body) || {};
+
+    try {
+        const pipeline = analysisPipeline.approveStep(pipelineId, stepId, data.notes ?? '');
+        sendJSON(res, 200, { success: true, data: pipeline });
+    } catch (error) {
+        sendJSON(res, 400, { success: false, error: error.message });
+    }
+}
+
+// POST /api/pipeline/:id/step/:step/reject - Reject a step
+async function handlePipelineReject(req, res, pipelineId, stepId) {
+    const body = await getBody(req);
+    const data = parseJSON(body) || {};
+
+    try {
+        const pipeline = analysisPipeline.rejectStep(pipelineId, stepId, data.feedback ?? '');
+        sendJSON(res, 200, { success: true, data: pipeline });
+    } catch (error) {
+        sendJSON(res, 400, { success: false, error: error.message });
+    }
+}
+
+// PUT /api/pipeline/:id/step/:step/artifact - Edit an artifact line
+async function handlePipelineEditArtifact(req, res, pipelineId, stepId) {
+    const body = await getBody(req);
+    const data = parseJSON(body);
+
+    if (!data || data.lineIndex === undefined || data.content === undefined) {
+        return sendJSON(res, 400, {
+            success: false,
+            error: 'Missing required fields: lineIndex, content'
+        });
+    }
+
+    try {
+        const pipeline = analysisPipeline.editArtifact(pipelineId, stepId, data.lineIndex, data.content);
+        sendJSON(res, 200, { success: true, data: pipeline });
+    } catch (error) {
+        sendJSON(res, 400, { success: false, error: error.message });
+    }
+}
+
+// POST /api/pipeline/:id/step/:step/comment - Add a comment
+async function handlePipelineComment(req, res, pipelineId, stepId) {
+    const body = await getBody(req);
+    const data = parseJSON(body);
+
+    if (!data || data.lineIndex === undefined || !data.text) {
+        return sendJSON(res, 400, {
+            success: false,
+            error: 'Missing required fields: lineIndex, text'
+        });
+    }
+
+    try {
+        const result = analysisPipeline.addComment(
+            pipelineId, stepId, data.lineIndex, data.text, data.author ?? 'User'
+        );
+        sendJSON(res, 200, { success: true, data: result });
+    } catch (error) {
+        sendJSON(res, 400, { success: false, error: error.message });
+    }
+}
+
+// ============================================================================
 // Request Router
 // ============================================================================
 
@@ -980,6 +1121,61 @@ async function handleRequest(req, res) {
         // POST /api/analyze
         if (method === 'POST' && url === '/api/analyze') {
             return await handleAnalyze(req, res);
+        }
+
+        // POST /api/chat
+        if (method === 'POST' && url === '/api/chat') {
+            return await chatController.chat(req, res);
+        }
+
+        // ============================================================
+        // Pipeline Routes
+        // ============================================================
+
+        // POST /api/pipeline/start - Start new pipeline
+        if (method === 'POST' && url.split('?')[0] === '/api/pipeline/start') {
+            return await handleStartPipeline(req, res);
+        }
+
+        // GET /api/pipeline - List all pipelines
+        if (method === 'GET' && url.split('?')[0] === '/api/pipeline') {
+            return await handleListPipelines(req, res);
+        }
+
+        // GET /api/pipeline/:id - Get pipeline status
+        if (method === 'GET' && urlParts[0] === 'api' && urlParts[1] === 'pipeline' &&
+            urlParts[2] && !urlParts[3]) {
+            return await handleGetPipeline(req, res, urlParts[2]);
+        }
+
+        // POST /api/pipeline/:id/next - Execute next step
+        if (method === 'POST' && urlParts[0] === 'api' && urlParts[1] === 'pipeline' &&
+            urlParts[2] && urlParts[3] === 'next') {
+            return await handlePipelineNext(req, res, urlParts[2]);
+        }
+
+        // POST /api/pipeline/:id/step/:step/approve
+        if (method === 'POST' && urlParts[0] === 'api' && urlParts[1] === 'pipeline' &&
+            urlParts[2] && urlParts[3] === 'step' && urlParts[4] && urlParts[5] === 'approve') {
+            return await handlePipelineApprove(req, res, urlParts[2], urlParts[4]);
+        }
+
+        // POST /api/pipeline/:id/step/:step/reject
+        if (method === 'POST' && urlParts[0] === 'api' && urlParts[1] === 'pipeline' &&
+            urlParts[2] && urlParts[3] === 'step' && urlParts[4] && urlParts[5] === 'reject') {
+            return await handlePipelineReject(req, res, urlParts[2], urlParts[4]);
+        }
+
+        // PUT /api/pipeline/:id/step/:step/artifact
+        if (method === 'PUT' && urlParts[0] === 'api' && urlParts[1] === 'pipeline' &&
+            urlParts[2] && urlParts[3] === 'step' && urlParts[4] && urlParts[5] === 'artifact') {
+            return await handlePipelineEditArtifact(req, res, urlParts[2], urlParts[4]);
+        }
+
+        // POST /api/pipeline/:id/step/:step/comment
+        if (method === 'POST' && urlParts[0] === 'api' && urlParts[1] === 'pipeline' &&
+            urlParts[2] && urlParts[3] === 'step' && urlParts[4] && urlParts[5] === 'comment') {
+            return await handlePipelineComment(req, res, urlParts[2], urlParts[4]);
         }
 
         // GET /api/approvals
@@ -1200,6 +1396,7 @@ async function startServer() {
         console.log('\n📊 Core Endpoints:');
         console.log('  GET  /api/status            - Agent status');
         console.log('  POST /api/analyze           - Process strategic query');
+        console.log('  POST /api/chat              - Artifact chatbot (LLM + RAG)');
         console.log('  GET  /api/approvals         - List pending approvals');
         console.log('  POST /api/approvals/:id/approve - Approve decision');
         console.log('  POST /api/approvals/:id/reject  - Reject decision');

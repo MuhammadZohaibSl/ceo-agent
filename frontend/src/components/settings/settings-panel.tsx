@@ -75,7 +75,7 @@ export function SettingsPanel({ onProviderChange }: SettingsPanelProps) {
 
     if (loading) {
         return (
-            <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 text-gray-400">
+            <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 text-muted-foreground border border-border/50">
                 <Loader2 className="w-4 h-4 animate-spin" />
             </button>
         );
@@ -85,7 +85,7 @@ export function SettingsPanel({ onProviderChange }: SettingsPanelProps) {
         <div className="relative">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
+                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors border border-border/50"
             >
                 <Settings className="w-4 h-4" />
                 <span className="text-sm hidden sm:inline">
@@ -95,10 +95,10 @@ export function SettingsPanel({ onProviderChange }: SettingsPanelProps) {
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 top-full mt-2 w-64 bg-gray-900 border border-white/10 rounded-xl shadow-xl z-50 overflow-hidden">
-                    <div className="p-3 border-b border-white/10">
-                        <h3 className="text-sm font-medium text-white">LLM Provider</h3>
-                        <p className="text-xs text-gray-400 mt-1">Select the AI model to use</p>
+                <div className="absolute right-0 top-full mt-2 w-64 bg-popover border border-border rounded-xl shadow-xl z-50 overflow-hidden text-popover-foreground">
+                    <div className="p-3 border-b border-border/50">
+                        <h3 className="text-sm font-medium">LLM Provider</h3>
+                        <p className="text-xs text-muted-foreground mt-1">Select the AI model to use</p>
                     </div>
                     
                     <div className="p-2">
@@ -113,8 +113,8 @@ export function SettingsPanel({ onProviderChange }: SettingsPanelProps) {
                                     disabled={saving || !providerInfo?.available}
                                     className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition-colors ${
                                         isActive 
-                                            ? 'bg-emerald-500/20 text-emerald-400' 
-                                            : 'hover:bg-white/5 text-gray-300'
+                                            ? 'bg-primary/10 text-primary' 
+                                            : 'hover:bg-muted text-muted-foreground hover:text-foreground'
                                     } ${!providerInfo?.available ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 >
                                     <div>

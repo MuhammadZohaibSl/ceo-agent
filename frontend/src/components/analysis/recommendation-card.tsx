@@ -8,13 +8,20 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { cn } from '@/lib/utils';
 import type { Recommendation } from '@/types/api';
+import { HighlightText } from '@/components/ui/highlight-text';
+import { EditableSection } from './editable-section';
+import { useQueryStore } from '@/stores/query-store';
 
 interface RecommendationCardProps {
   recommendation: Recommendation;
 }
 
 export function RecommendationCard({ recommendation }: RecommendationCardProps) {
+  const { currentResult, editResultArtifact, addResultComment } = useQueryStore();
+  const artifacts = currentResult?.proposal?.artifacts;
+
   const getRiskColor = (risk: string) => {
     switch (risk) {
       case 'low': return 'bg-green-500/10 text-green-500 border-green-500/20';
@@ -27,69 +34,84 @@ export function RecommendationCard({ recommendation }: RecommendationCardProps) 
   const scorePercent = Math.round(recommendation.score * 100);
   
   return (
-    <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
-      <CardHeader className="pb-3">
+    <Card className="border-none bg-gradient-to-br from-primary/5 to-transparent shadow-md overflow-hidden">
+      <CardHeader className="pb-3 bg-muted/20">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base font-medium flex items-center gap-2">
-
+          <CardTitle className="text-sm font-medium flex items-center gap-2 uppercase tracking-tighter opacity-70">
             Top Recommendation
           </CardTitle>
-          <Badge variant="outline" className={getRiskColor(recommendation.riskLevel)}>
+          <Badge variant="outline" className={cn('border-none shadow-sm capitalize', getRiskColor(recommendation.riskLevel))}>
             {recommendation.riskLevel} risk
           </Badge>
         </div>
       </CardHeader>
       
-      <CardContent className="space-y-4">
-        <div>
-          <h3 className="text-lg font-semibold text-foreground mb-1">
-            {recommendation.title}
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            {recommendation.description}
-          </p>
+      <CardContent className="p-0">
+        {/* Main Content Areas */}
+        <div className="p-6 space-y-6">
+          <div>
+            <h3 className="text-xl font-bold text-foreground mb-3 tracking-tight">
+              {recommendation.title}
+            </h3>
+            <EditableSection
+              sectionId="description"
+              artifact={artifacts?.description}
+              content={recommendation.description}
+              onEdit={(idx, content) => editResultArtifact('description', idx, content)}
+              onComment={(idx, text) => addResultComment('description', idx, text)}
+            />
+          </div>
+          
+          {/* Key Metrics Grid */}
+          <div className="grid grid-cols-3 gap-1 rounded-2xl bg-muted/20 overflow-hidden border-none shadow-inner p-1">
+            <div className="bg-background/40 p-4 text-center rounded-xl">
+              <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1 tracking-widest">Budget</p>
+              <p className="text-base font-semibold text-foreground">
+                ${recommendation.estimatedCost?.toLocaleString() || 'N/A'}
+              </p>
+            </div>
+            <div className="bg-background/40 p-4 text-center rounded-xl">
+              <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1 tracking-widest">Horizon</p>
+              <p className="text-base font-semibold text-foreground">
+                {recommendation.timeToImplement || 'N/A'}
+              </p>
+            </div>
+            <div className="bg-primary/5 p-4 text-center rounded-xl">
+              <p className="text-[10px] uppercase font-bold text-primary/70 mb-1 tracking-widest">Score</p>
+              <p className="text-base font-bold text-primary">
+                {scorePercent}%
+              </p>
+            </div>
+          </div>
+          
+          {/* Rationale Section */}
+          {recommendation.rationale && (
+            <div className="pt-6 border-t border-border/10">
+              <EditableSection
+                title="Strategic Rationale"
+                sectionId="rationale"
+                artifact={artifacts?.rationale}
+                content={recommendation.rationale}
+                onEdit={(idx, content) => editResultArtifact('rationale', idx, content)}
+                onComment={(idx, text) => addResultComment('rationale', idx, text)}
+              />
+            </div>
+          )}
         </div>
         
-        {/* Key Metrics */}
-        <div className="grid grid-cols-3 gap-4 p-4 rounded-lg bg-muted/30 border border-border/30">
-          <div className="text-center">
-            <p className="text-xs text-muted-foreground mb-1">Estimated Cost</p>
-            <p className="text-sm font-semibold text-foreground">
-              ${recommendation.estimatedCost?.toLocaleString() || 'N/A'}
-            </p>
-          </div>
-          <div className="text-center border-x border-border/30">
-            <p className="text-xs text-muted-foreground mb-1">Timeline</p>
-            <p className="text-sm font-semibold text-foreground">
-              {recommendation.timeToImplement || 'N/A'}
-            </p>
-          </div>
-          <div className="text-center">
-            <p className="text-xs text-muted-foreground mb-1">Score</p>
-            <p className="text-sm font-semibold text-primary">
-              {scorePercent}%
-            </p>
-          </div>
+        {/* Progress Footer */}
+        <div className="bg-muted/10 px-6 py-4 flex flex-col gap-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-muted-foreground font-medium">Proposal Confidence</span>
+              <span className="font-bold text-primary">{scorePercent}%</span>
+            </div>
+            <div className="w-full bg-primary/10 h-1.5 rounded-full overflow-hidden">
+                <div 
+                    className="bg-primary h-full transition-all duration-500 ease-out" 
+                    style={{ width: `${scorePercent}%` }}
+                />
+            </div>
         </div>
-        
-        {/* Score Progress */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-xs">
-            <span className="text-muted-foreground">Confidence Score</span>
-            <span className="font-medium text-primary">{scorePercent}%</span>
-          </div>
-          <Progress value={scorePercent} className="h-2" />
-        </div>
-        
-        {/* Rationale */}
-        {recommendation.rationale && (
-          <div className="pt-2 border-t border-border/30">
-            <p className="text-xs text-muted-foreground mb-1 font-medium">Rationale</p>
-            <p className="text-sm text-foreground/80">
-              {recommendation.rationale}
-            </p>
-          </div>
-        )}
       </CardContent>
     </Card>
   );

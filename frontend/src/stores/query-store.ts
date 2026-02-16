@@ -31,8 +31,9 @@ interface QueryState {
     setResult: (result: AnalysisResult) => void;
     setIsAnalyzing: (isAnalyzing: boolean) => void;
     setError: (error: string | null) => void;
-    clearResult: () => void;
     clearAll: () => void;
+    editResultArtifact: (sectionId: string, lineIndex: number, content: string, initialContent?: string) => void;
+    addResultComment: (sectionId: string, lineIndex: number, text: string, initialContent?: string) => void;
 }
 
 export const useQueryStore = create<QueryState>()(
@@ -81,8 +82,6 @@ export const useQueryStore = create<QueryState>()(
 
             setError: (error) => set({ error, isAnalyzing: false }),
 
-            clearResult: () => set({ currentResult: null, error: null }),
-
             clearAll: () => set({
                 query: '',
                 constraints: {},
@@ -90,6 +89,106 @@ export const useQueryStore = create<QueryState>()(
                 isAnalyzing: false,
                 error: null,
             }),
+
+            editResultArtifact: (sectionId, lineIndex, content, initialContent?: string) => {
+                const state = get();
+                if (!state.currentResult) return;
+
+                const { currentResult } = state;
+                const { proposal } = currentResult;
+                const artifacts = { ...(proposal.artifacts || {}) };
+
+                let artifact = artifacts[sectionId];
+
+                // Initialize if missing
+                if (!artifact) {
+                    const rawContent = initialContent || '';
+
+                    artifact = {
+                        lines: rawContent.split('\n'),
+                        edits: [],
+                        comments: [],
+                    };
+                }
+
+                const lines = [...artifact.lines];
+                if (lineIndex >= lines.length) {
+                    // Safety check/expand if needed
+                    while (lines.length <= lineIndex) lines.push('');
+                }
+                const originalContent = lines[lineIndex];
+                lines[lineIndex] = content;
+
+                const newEdit = {
+                    id: Math.random().toString(36).substring(2, 9),
+                    lineIndex,
+                    originalContent,
+                    newContent: content,
+                    editedAt: new Date().toISOString(),
+                };
+
+                set({
+                    currentResult: {
+                        ...currentResult,
+                        proposal: {
+                            ...proposal,
+                            artifacts: {
+                                ...artifacts,
+                                [sectionId]: {
+                                    ...artifact,
+                                    lines,
+                                    edits: [...artifact.edits, newEdit],
+                                },
+                            },
+                        },
+                    },
+                });
+            },
+
+            addResultComment: (sectionId, lineIndex, text, initialContent?: string) => {
+                const state = get();
+                if (!state.currentResult) return;
+
+                const { currentResult } = state;
+                const { proposal } = currentResult;
+                const artifacts = { ...(proposal.artifacts || {}) };
+
+                let artifact = artifacts[sectionId];
+                if (!artifact) {
+                    const rawContent = initialContent || '';
+
+                    artifact = {
+                        lines: rawContent.split('\n'),
+                        edits: [],
+                        comments: [],
+                    };
+                }
+
+                const newComment = {
+                    id: Math.random().toString(36).substring(2, 9),
+                    lineIndex,
+                    text,
+                    author: 'CEO',
+                    createdAt: new Date().toISOString(),
+                    resolved: false,
+                };
+
+                set({
+                    currentResult: {
+                        ...currentResult,
+                        proposal: {
+                            ...proposal,
+                            artifacts: {
+                                ...artifacts,
+                                [sectionId]: {
+                                    ...artifact,
+                                    comments: [...artifact.comments, newComment],
+                                },
+                            },
+                        },
+                    },
+                });
+            },
         }),
         {
             name: 'ceo-agent-query-store',

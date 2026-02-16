@@ -165,6 +165,17 @@ function getRAGEngine() {
 }
 
 /**
+ * Hydrate the singleton with externally-created instances.
+ * Used when server.js manages its own lifecycle but the
+ * chat controller still reads from agentService.
+ */
+function hydrate({ llmRouter: lr, ragEngine: re, agent: ag } = {}) {
+    if (lr) llmRouter = lr;
+    if (re) ragEngine = re;
+    if (ag) agent = ag;
+}
+
+/**
  * Cleanup resources
  */
 function destroy() {
@@ -175,6 +186,7 @@ function destroy() {
 
 export const agentService = {
     initialize,
+    hydrate,
     getAgent,
     getLLMRouter,
     getApprovalManager,

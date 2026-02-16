@@ -1,79 +1,103 @@
-'use client';
-
-/**
- * Alternatives List Component
- * Displays alternative options from the analysis
- */
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import type { Alternative } from '@/types/api';
+import { cn } from '@/lib/utils';
+import { EditableSection } from './editable-section';
+import { useQueryStore } from '@/stores/query-store';
 
 interface AlternativesListProps {
   alternatives: Alternative[];
 }
 
 export function AlternativesList({ alternatives }: AlternativesListProps) {
+  const { currentResult, editResultArtifact, addResultComment } = useQueryStore();
+  const artifacts = currentResult?.proposal?.artifacts;
+
   if (!alternatives || alternatives.length === 0) {
     return null;
   }
   
   const getRiskColor = (risk: string) => {
     switch (risk) {
-      case 'low': return 'bg-green-500/10 text-green-500 border-green-500/20';
-      case 'medium': return 'bg-amber-500/10 text-amber-500 border-amber-500/20';
-      case 'high': return 'bg-red-500/10 text-red-500 border-red-500/20';
+      case 'low': return 'bg-green-500/10 text-green-500 border-none shadow-sm';
+      case 'medium': return 'bg-amber-500/10 text-amber-500 border-none shadow-sm';
+      case 'high': return 'bg-red-500/10 text-red-500 border-none shadow-sm';
       default: return 'bg-muted text-muted-foreground';
     }
   };
   
   return (
-    <Card className="border-border/50 bg-card/80">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-base font-medium flex items-center gap-2">
-
-          Alternative Options
+    <Card className="border-none bg-card/40 shadow-inner overflow-hidden rounded-3xl">
+      <CardHeader className="pb-3 bg-muted/20">
+        <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+           Strategic Counter-Options
         </CardTitle>
       </CardHeader>
       
-      <CardContent className="space-y-3">
-        {alternatives.map((alt, index) => (
-          <div 
-            key={alt.id || index}
-            className="p-4 rounded-lg bg-muted/30 border border-border/30 space-y-2"
-          >
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-muted flex items-center justify-center text-xs font-medium text-muted-foreground">
-                  {alt.rank || index + 2}
-                </span>
-                <h4 className="font-medium text-foreground">
-                  {alt.title}
-                </h4>
+      <CardContent className="space-y-4 pt-6">
+        {alternatives.map((alt, index) => {
+          const sectionId = `alternative-${index}`;
+          const tradeoffId = `alternative-tradeoff-${index}`;
+          
+          return (
+            <div 
+              key={alt.id || index}
+              className="rounded-2xl bg-muted/20 border-none overflow-hidden group transition-all hover:bg-muted/30"
+            >
+              {/* Alt Header */}
+              <div className="px-5 py-3 flex items-center justify-between bg-muted/30">
+                <div className="flex items-center gap-3">
+                  <span className="flex items-center justify-center h-6 w-6 rounded-lg bg-primary/10 text-[10px] font-black text-primary border-none shadow-sm shadow-primary/5">
+                    {alt.rank || index + 2}
+                  </span>
+                  <h4 className="text-sm font-bold text-foreground tracking-tight">
+                    {alt.title}
+                  </h4>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className={cn('border-none shadow-sm text-[9px] font-bold uppercase', getRiskColor(alt.riskLevel))}>
+                    {alt.riskLevel}
+                  </Badge>
+                  <Badge variant="secondary" className="bg-primary/5 text-primary border-none text-[9px] font-black tabular-nums">
+                    {Math.round(alt.score * 100)}%
+                  </Badge>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className={getRiskColor(alt.riskLevel)}>
-                  {alt.riskLevel}
-                </Badge>
-                <Badge variant="secondary" className="text-xs">
-                  {Math.round(alt.score * 100)}%
-                </Badge>
+              
+              {/* Alt Body */}
+              <div className="p-1">
+                <EditableSection
+                    sectionId={sectionId}
+                    artifact={artifacts?.[sectionId]}
+                    content={alt.description}
+                    onEdit={(idx, content) => editResultArtifact(sectionId, idx, content, alt.description)}
+                    onComment={(idx, text) => addResultComment(sectionId, idx, text, alt.description)}
+                    className="bg-transparent"
+                />
               </div>
+
+              {/* Trade-off Sub-section */}
+              {alt.tradeoffVsTop && (
+                <div className="px-5 pb-4 pt-2">
+                   <div className="p-3 rounded-xl bg-primary/5 border-none shadow-inner">
+                      <p className="text-[9px] font-bold text-primary/60 uppercase tracking-widest mb-1.5 flex items-center gap-2">
+                         <span className="h-0.5 w-2 bg-primary/30 rounded-full" />
+                         Trade-off vs Top Rec
+                      </p>
+                      <EditableSection
+                        sectionId={tradeoffId}
+                        artifact={artifacts?.[tradeoffId]}
+                        content={alt.tradeoffVsTop}
+                        onEdit={(idx, content) => editResultArtifact(tradeoffId, idx, content, alt.tradeoffVsTop)}
+                        onComment={(idx, text) => addResultComment(tradeoffId, idx, text, alt.tradeoffVsTop)}
+                        className="bg-transparent"
+                      />
+                   </div>
+                </div>
+              )}
             </div>
-            
-            {alt.description && (
-              <p className="text-sm text-muted-foreground pl-7">
-                {alt.description}
-              </p>
-            )}
-            
-            {alt.tradeoffVsTop && (
-              <p className="text-xs text-muted-foreground/70 pl-7 italic">
-                Trade-off: {alt.tradeoffVsTop}
-              </p>
-            )}
-          </div>
-        ))}
+          );
+        })}
       </CardContent>
     </Card>
   );
